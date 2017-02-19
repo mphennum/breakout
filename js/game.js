@@ -17,8 +17,13 @@ var game = window.game = {
 	'objmap': {}
 };
 
+var Renderer;
 var objmap = game.objmap;
+
 game.start = function() {
+	Renderer = game.Renderer;
+	Renderer.init();
+
 	var elapsed;
 	var prev;
 	var now = (new Date()).getTime();
@@ -82,7 +87,7 @@ game.add = function(obj) {
 	}
 
 	if (obj.mesh) {
-		game.renderer.scene.add(obj.mesh);
+		Renderer.add(obj.mesh);
 	}
 }; // add
 
@@ -92,7 +97,7 @@ game.remove = function(obj) {
 	}
 
 	if (obj.mesh) {
-		game.renderer.scene.remove(obj.mesh);
+		Renderer.remove(obj.mesh);
 	}
 }; // remove
 
