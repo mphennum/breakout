@@ -1,9 +1,11 @@
 (function() {
 
+'use strict';
+
 var game = window.game = {
 	'dev': true,
 	'over': false,
-	'modules': 'Ext.Three',
+	'modules': ['Ext.Three', 'Objs.Player'],
 	'urlmap': {
 		'base': 'http://www.mphennum.com/work/breakout/'
 	},
