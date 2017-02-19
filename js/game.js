@@ -5,7 +5,8 @@
 var game = window.game = {
 	'dev': true,
 	'over': false,
-	'modules': ['Ext.Three', 'Renderer', 'Objs.Camera', 'Objs.Player'],
+	'extensions': ['Ext.Three'],
+	'modules': ['Renderer', 'Objs.Camera', 'Objs.Player'],
 	'urlmap': {
 		'base': 'http://www.mphennum.com/work/breakout/'
 	},
@@ -17,12 +18,29 @@ var game = window.game = {
 	'objmap': {}
 };
 
+var Objs;
 var Renderer;
+var camera;
 var objmap = game.objmap;
 
 game.start = function() {
+	var timer;
+	window.onresize = function() {
+		clearTimeout(timer);
+		timer = setTimeout(function(event) {
+			for (var i = 0; i < resizecbs.length; ++i) {
+				resizecbs[i](window.innerWidth, window.innerHeight);
+			}
+		}, 99);
+	}; // onresize
+
+	Objs = game.Objs;
+
 	Renderer = game.Renderer;
 	Renderer.init();
+
+	camera = new Objs.Camera();
+	game.add(camera);
 
 	var elapsed;
 	var prev;
@@ -32,7 +50,6 @@ game.start = function() {
 		prev = now;
 		now = (new Date()).getTime();
 		elapsed = now - prev;
-		//game.log(elapsed);
 		for (var k in objmap) {
 			objmap[k].update(elapsed);
 		}
@@ -88,6 +105,10 @@ game.add = function(obj) {
 
 	if (obj.mesh) {
 		Renderer.add(obj.mesh);
+	} else if (obj.children) {
+		for (var i = 0, children = obj.children; i < children.length; ++i) {
+			Renderer.add(children[i]);
+		}
 	}
 }; // add
 
@@ -98,9 +119,14 @@ game.remove = function(obj) {
 
 	if (obj.mesh) {
 		Renderer.remove(obj.mesh);
+	} else if (obj.children) {
+		for (var i = 0, children = obj.children; i < children.length; ++i) {
+			Renderer.remove(children[i]);
+		}
 	}
 }; // remove
 
+var loadedmap = {};
 game.load = function(modules, cb) {
 	if (modules instanceof Array) {
 		var remaining = modules.length;
@@ -131,7 +157,7 @@ game.load = function(modules, cb) {
 
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
-	script.async = 'true';
+	//script.async = 'true';
 	script.onload = ready;
 	script.onreadystatechange = function() {
 		if (this.readyState === 'loaded' || this.readyState === 'complete') {
@@ -144,6 +170,11 @@ game.load = function(modules, cb) {
 	game.elemap.$head.appendChild(script);
 }; // load
 
+var resizecbs = [];
+game.onresize = function(cb) {
+	resizecbs[resizecbs.length] = cb;
+}; // onresize
+
 game.log = function() {
 	if (game.dev) {
 		console.log.apply(console, arguments);
@@ -151,6 +182,6 @@ game.log = function() {
 }; // log
 
 // init
-game.load(game.modules, game.start);
+game.load(game.extensions, game.load.bind(game, game.modules, game.start));
 
 })();
