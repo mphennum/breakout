@@ -5,18 +5,19 @@
 var game = window.game = {
 	'dev': true,
 	'over': false,
-	'modules': ['Ext.Three', 'Objs.Player'],
+	'modules': ['Ext.Three', 'Renderer', 'Objs.Camera', 'Objs.Player'],
 	'urlmap': {
 		'base': 'http://www.mphennum.com/work/breakout/'
 	},
 	'elemap': {
 		'$head': document.getElementsByTagName('head')[0],
-		'$body': document.getElementsByTagName('body')[0]
+		'$body': document.getElementsByTagName('body')[0],
+		'$canvas': null
 	},
-	'objs': []
+	'objmap': {}
 };
 
-var objs = game.objs;
+var objmap = game.objmap;
 game.start = function() {
 	var elapsed;
 	var prev;
@@ -27,8 +28,8 @@ game.start = function() {
 		now = (new Date()).getTime();
 		elapsed = now - prev;
 		//game.log(elapsed);
-		for (var i = 0; i < objs.length; ++i) {
-			objs.update(elapsed);
+		for (var k in objmap) {
+			objmap[k].update(elapsed);
 		}
 
 		if (!game.over) {
@@ -38,6 +39,62 @@ game.start = function() {
 
 	loop();
 }; // start
+
+var idchars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+var idcharslen = idchars.length;
+var lastid = null;
+var idcharmap = {};
+for (var i = 0; i < idcharslen; ++i) {
+	idcharmap[idchars[i]] = i;
+}
+
+game.genID = function() {
+	if (lastid === null) {
+		lastid = idchars[0];
+		return lastid;
+	}
+
+	var id = lastid;
+	var i = id.length - 1;
+	for (; i > -1; --i) {
+		var pos = idcharmap[id[i]] + 1;
+		if (pos < idcharslen) {
+			id = id.substr(0, i) + idchars[pos] + id.substr(i + 1);
+			break;
+		}
+
+		//console.log('no break');
+		id = id.substr(0, i) + idchars[0] + id.substr(i + 1);
+	}
+
+	if (i === -1) {
+		id += idchars[0];
+	}
+
+	lastid = id;
+	return id;
+}; // genID
+
+game.add = function(obj) {
+	if (obj.update) {
+		obj.id = game.genID();
+		objmap[obj.id] = obj;
+	}
+
+	if (obj.mesh) {
+		game.renderer.scene.add(obj.mesh);
+	}
+}; // add
+
+game.remove = function(obj) {
+	if (obj.id) {
+		delete objmap[obj.id];
+	}
+
+	if (obj.mesh) {
+		game.renderer.scene.remove(obj.mesh);
+	}
+}; // remove
 
 game.load = function(modules, cb) {
 	if (modules instanceof Array) {
