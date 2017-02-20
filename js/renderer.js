@@ -6,16 +6,15 @@ var Renderer = game.Renderer = {};
 
 var scene;
 var renderer;
+var camera;
 
 Renderer.init = function(opts) {
 	opts = opts || {};
-	opts.shadow = opts.shadow || {};
-	opts.shadow.far = opts.shadow.far || 1000;
 
 	scene = new THREE.Scene();
 
 	renderer = new THREE.WebGLRenderer({'antialias': true});
-	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(opts.width || window.innerWidth, opts.height || window.innerHeight);
 	game.elemap.$body.appendChild(renderer.domElement);
 
 	// shadows
@@ -25,9 +24,9 @@ Renderer.init = function(opts) {
 	renderer.shadowMap.soft = true;
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-	renderer.shadowCameraNear = 3;
-	renderer.shadowCameraFar = opts.shadow.far;
-	renderer.shadowCameraFov = 45;
+	renderer.shadowCameraNear = opts['shadow-near'] || 1;
+	renderer.shadowCameraFar = opts['shadow-far'] || 1000;
+	renderer.shadowCameraFov = opts['shadow-fov'] || 45;
 
 	renderer.shadowMapBias = 0.002;
 	renderer.shadowMapDarkness = 0.5;
@@ -40,6 +39,10 @@ Renderer.init = function(opts) {
 	}); // onresize
 }; // init
 
+Renderer.render = function() {
+	renderer.render(scene, camera);
+}; // render
+
 Renderer.add = function(mesh) {
 	scene.add(mesh);
 }; // add
@@ -50,21 +53,80 @@ Renderer.remove = function(mesh) {
 
 Renderer.createCamera = function(opts) {
 	opts = opts || {};
-	opts.fov = opts.fov || 45;
-	opts.width = opts.width || window.innerWidth;
-	opts.height = opts.height || window.innerHeight;
-	opts.near = opts.near || 1;
-	opts.far = opts.far || 1000;
 
-	var camera = new THREE.PerspectiveCamera(opts.fov, opts.width / opts.height, opts.near, opts.far)
+	camera = new THREE.PerspectiveCamera(
+		opts.fov || 45,
+		(opts.width || window.innerWidth) / (opts.height || window.innerHeight),
+		opts.near || 1,
+		opts.far || 1000
+	);
+
+	game.onresize(function(width, height) {
+		camera.aspect = width / height;
+		camera.updateProjectionMatrix();
+	}); // onresize
+
 	return camera;
 }; // renderCamera
 
-Renderer.resizeCamera = function(camera, width, height) {
-	width = width || window.innerWidth;
-	height = height || window.Height;
-	camera.aspect = width / height;
-	camera.updateProjectionMatrix();
-}; // resizeCamera
+Renderer.createLight = function(opts) {
+	opts = opts || {};
+
+	var light = new THREE.DirectionalLight(opts.color || 0xFFFFFF, opts.intensity || 1);
+
+	light.castShadow = (opts.shadow !== false);
+	//light.shadowDarkness = opts['shadow-darkness'] || 0.5;
+
+	//light.shadowCameraVisible = !!opts['shadow-camera'];
+	light.shadow.camera.top = opts['shadow-camera-top'] || 150;
+	light.shadow.camera.bottom = opts['shadow-camera-bottom'] || 150;
+	light.shadow.camera.left = opts['shadow-camera-left'] || 150;
+	light.shadow.camera.right = opts['shadow-camera-right'] || 150;
+
+	return light;
+}; // createLight
+
+Renderer.createCube = function(opts) {
+	opts = opts || {};
+
+	//var material = new THREE.MeshLambertMaterial({
+	var material = new THREE.MeshToonMaterial({
+		'color': opts.color || 0xFFFFFF
+	});
+
+	var cube = new THREE.Mesh(
+		new THREE.BoxGeometry(
+			opts.width || 1,
+			opts.height || 1,
+			opts.depth || 1,
+			opts['width-segments'] || 1,
+			opts['height-segments'] || 1,
+			opts['depth-segments'] || 1
+		),
+		material
+	);
+
+	return cube;
+}; // createCube
+
+Renderer.createSphere = function(opts) {
+	opts = opts || {};
+
+	//var material = new THREE.MeshLambertMaterial({
+	var material = new THREE.MeshToonMaterial({
+		'color': opts.color || 0xFFFFFF
+	});
+
+	var sphere = new THREE.Mesh(
+		new THREE.SphereGeometry(
+			opts.radius || 1,
+			opts['width-segments'] || 3,
+			opts['height-segments'] || 2
+		),
+		material
+	);
+
+	return sphere;
+}; // createSphere
 
 })(window.game, window.THREE);
