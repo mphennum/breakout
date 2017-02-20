@@ -2,37 +2,52 @@
 
 'use strict';
 
-var Obj = game.Obj = function(opts) {
-	//opts = opts || {};
+var Obj = game.Obj = {};
 
-	this.mesh = null;
-}; // constructor
+Obj.__init__ = function(cb) {
+	delete Obj.__init__;
 
-//Obj.prototype.resize = function(w, h) {}; // resize
+	game.load(function() {
 
-Obj.prototype.render = function(mesh) {
-	this.mesh = mesh || null;
-	game.add(this);
-}; // render
+		Obj = game.Obj = function(opts) {
+			//opts = opts || {};
 
-Obj.prototype.move = function(x, y, z) {
-	var pos = this.mesh.position;
+			this.mesh = null;
+		}; // constructor
 
-	if (x) {
-		pos.x += x;
-	}
+		//Obj.prototype.resize = function(w, h) {}; // resize
 
-	if (y) {
-		pos.y += y;
-	}
+		Obj.prototype.render = function(mesh) {
+			this.mesh = mesh || null;
+			game.add(this);
+		}; // render
 
-	if (z) {
-		pos.z += z;
-	}
-}; // move
+		Obj.prototype.move = function(x, y, z) {
+			var pos = this.mesh.position;
 
-Obj.prototype.intersects = function(obj) {
-	return false;
-}; // intersects
+			if (x) {
+				pos.x += x;
+			}
+
+			if (y) {
+				pos.y += y;
+			}
+
+			if (z) {
+				pos.z += z;
+			}
+		}; // move
+
+		Obj.prototype.intersects = function(obj) {
+			return false;
+		}; // intersects
+
+		if (cb) {
+			cb();
+		}
+
+	}); // load
+
+}; // __init__
 
 })(window.game);
