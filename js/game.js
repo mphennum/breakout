@@ -6,21 +6,19 @@ var game = window.game = {
 	'dev': true,
 	'over': false,
 	'extensions': ['Ext.Three'],
-	'modules': ['Renderer', 'Objs.Camera', 'Objs.Player'],
+	'modules': ['Renderer', 'Obj', 'Obj.Camera', 'Obj.Light', 'Obj.Cube', 'Obj.Sphere', 'Obj.Player', 'Obj.Ball', 'Obj.Brick', 'Obj.Wall', 'Obj.Background'],
 	'urlmap': {
 		'base': 'http://www.mphennum.com/work/breakout/'
 	},
 	'elemap': {
 		'$head': document.getElementsByTagName('head')[0],
-		'$body': document.getElementsByTagName('body')[0],
-		'$canvas': null
+		'$body': document.getElementsByTagName('body')[0]
 	},
 	'objmap': {}
 };
 
-var Objs;
+var Obj;
 var Renderer;
-var camera;
 var objmap = game.objmap;
 
 game.start = function() {
@@ -34,32 +32,37 @@ game.start = function() {
 		}, 99);
 	}; // onresize
 
-	Objs = game.Objs;
+	Obj = game.Obj;
 
 	Renderer = game.Renderer;
 	Renderer.init();
 
-	camera = new Objs.Camera();
-	game.add(camera);
+	var camera = new Obj.Camera();
+	var light = new Obj.Light();
 
-	var elapsed;
+	// loop
+
 	var prev;
-	var now = (new Date()).getTime();
+	var elapsed;
 
-	var loop = function() {
-		prev = now;
-		now = (new Date()).getTime();
-		elapsed = now - prev;
+	var loop = function(ms) {
+		elapsed = ms - prev;
+		if (elapsed < 0) {
+			game.log(elapsed);
+		}
+
 		for (var k in objmap) {
 			objmap[k].update(elapsed);
 		}
 
-		if (!game.over) {
-			setTimeout(loop, 1);
-		}
+		Renderer.render();
+
+		prev = ms;
+		requestAnimationFrame(loop);
 	}; // loop
 
-	loop();
+	prev = window.performance.now();
+	setTimeout(loop.bind(prev), 1);
 }; // start
 
 var idchars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -105,11 +108,11 @@ game.add = function(obj) {
 
 	if (obj.mesh) {
 		Renderer.add(obj.mesh);
-	} else if (obj.children) {
+	}/* else if (obj.children) {
 		for (var i = 0, children = obj.children; i < children.length; ++i) {
 			Renderer.add(children[i]);
 		}
-	}
+	}*/
 }; // add
 
 game.remove = function(obj) {
@@ -119,11 +122,11 @@ game.remove = function(obj) {
 
 	if (obj.mesh) {
 		Renderer.remove(obj.mesh);
-	} else if (obj.children) {
+	}/* else if (obj.children) {
 		for (var i = 0, children = obj.children; i < children.length; ++i) {
 			Renderer.remove(children[i]);
 		}
-	}
+	}*/
 }; // remove
 
 var loadedmap = {};
@@ -157,7 +160,7 @@ game.load = function(modules, cb) {
 
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
-	//script.async = 'true';
+	script.async = 'true';
 	script.onload = ready;
 	script.onreadystatechange = function() {
 		if (this.readyState === 'loaded' || this.readyState === 'complete') {
