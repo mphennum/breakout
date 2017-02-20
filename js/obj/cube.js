@@ -2,26 +2,42 @@
 
 'use strict';
 
-var Obj = game.Obj;
+var Obj = game.Obj = game.Obj || {};
+var Cube = Obj.Cube = {};
 
-var Cube = Obj.Cube = function(opts) {
-	opts = opts || {};
+Cube.__init__ = function(cb) {
+	delete Cube.__init__;
 
-	Obj.call(this, opts);
+	game.load(['Renderer', 'Obj'], function() {
 
-	this.render(game.Renderer.createCube({
-		'color': opts.color,
-		'width': opts.width,
-		'height': opts.height,
-		'depth': opts.depth,
-		'width-segments': opts['width-segments'],
-		'height-segments': opts['height-segments'],
-		'depth-segments': opts['depth-segments']
-	})); // render
+		Obj = game.Obj;
 
-	this.move(opts.x, opts.y, opts.z);
-}; // constructor
+		Cube = Obj.Cube = function(opts) {
+			opts = opts || {};
 
-Cube.prototype = Object.create(Obj.prototype);
+			Obj.call(this, opts);
+
+			this.render(game.Renderer.createCube({
+				'color': opts.color,
+				'width': opts.width,
+				'height': opts.height,
+				'depth': opts.depth,
+				'width-segments': opts['width-segments'],
+				'height-segments': opts['height-segments'],
+				'depth-segments': opts['depth-segments']
+			})); // render
+
+			this.move(opts.x, opts.y, opts.z);
+		}; // constructor
+
+		Cube.prototype = Object.create(Obj.prototype);
+
+		if (cb) {
+			cb();
+		}
+
+	}); // load
+
+}; // __init__
 
 })(window.game);
