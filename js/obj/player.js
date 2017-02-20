@@ -2,17 +2,33 @@
 
 'use strict';
 
-var Obj = game.Obj;
-var Cube = Obj.Cube;
+var Obj = game.Obj = game.Obj || {};
+var Player = Obj.Player = {};
 
-var Player = Obj.Player = function(opts) {
-	Cube.call(this, opts);
-}; // constructor
+Player.__init__ = function(cb) {
+	delete Player.__init__;
 
-Player.prototype = Object.create(Cube.prototype);
+	game.load(['Renderer', 'Obj', 'Obj.Cube'], function() {
 
-Player.prototype.update = function(elapsed) {
+		Obj = game.Obj;
 
-}; // update
+		var Cube = Obj.Cube;
+
+		Player = Obj.Player = function(opts) {
+			Cube.call(this, opts);
+		}; // constructor
+
+		Player.prototype = Object.create(Cube.prototype);
+
+		Player.prototype.update = function(elapsed) {
+
+		}; // update
+
+		if (cb) {
+			cb();
+		}
+
+	}); // load
+}; // __init__
 
 })(window.game);
