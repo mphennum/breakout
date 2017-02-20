@@ -1,132 +1,149 @@
-(function(game, THREE) {
+(function(game) {
 
 'use strict';
 
 var Renderer = game.Renderer = {};
 
-var scene;
-var renderer;
-var camera;
+Renderer.__init__ = function(cb) {
+	game.log('Renderer.__init__');
+	delete Renderer.__init__;
 
-Renderer.init = function(opts) {
-	opts = opts || {};
+	game.load('Ext.THREE', function() {
+		game.log('Renderer ready after load (THREE)');
 
-	scene = new THREE.Scene();
+		var THREE = window.THREE;
 
-	renderer = new THREE.WebGLRenderer({'antialias': true});
-	renderer.setSize(opts.width || window.innerWidth, opts.height || window.innerHeight);
-	game.elemap.$body.appendChild(renderer.domElement);
+		var scene;
+		var renderer;
+		var camera;
 
-	// shadows
+		Renderer.init = function(opts) {
+			opts = opts || {};
 
-	renderer.shadowMap.enabled = true;
-	//renderer.shadowMapSoft = true;
-	renderer.shadowMap.soft = true;
-	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			scene = new THREE.Scene();
 
-	renderer.shadowCameraNear = opts['shadow-near'] || 1;
-	renderer.shadowCameraFar = opts['shadow-far'] || 1000;
-	renderer.shadowCameraFov = opts['shadow-fov'] || 45;
+			renderer = new THREE.WebGLRenderer({'antialias': true});
+			renderer.setSize(opts.width || window.innerWidth, opts.height || window.innerHeight);
+			game.elemap.$body.appendChild(renderer.domElement);
 
-	renderer.shadowMapBias = 0.002;
-	renderer.shadowMapDarkness = 0.5;
-	renderer.shadowMapWidth = 1024;
-	renderer.shadowMapHeight = 1024;
+			// shadows
 
-	// resize
-	game.onresize(function(width, height) {
-		renderer.setSize(width, height);
-	}); // onresize
-}; // init
+			renderer.shadowMap.enabled = true;
+			//renderer.shadowMapSoft = true;
+			renderer.shadowMap.soft = true;
+			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-Renderer.render = function() {
-	renderer.render(scene, camera);
-}; // render
+			renderer.shadowCameraNear = opts['shadow-near'] || 1;
+			renderer.shadowCameraFar = opts['shadow-far'] || 1000;
+			renderer.shadowCameraFov = opts['shadow-fov'] || 45;
 
-Renderer.add = function(mesh) {
-	scene.add(mesh);
-}; // add
+			renderer.shadowMapBias = 0.002;
+			renderer.shadowMapDarkness = 0.5;
+			renderer.shadowMapWidth = 1024;
+			renderer.shadowMapHeight = 1024;
 
-Renderer.remove = function(mesh) {
-	scene.remove(mesh);
-}; // add
+			// resize
+			game.onresize(function(width, height) {
+				renderer.setSize(width, height);
+			}); // onresize
+		}; // init
 
-Renderer.createCamera = function(opts) {
-	opts = opts || {};
+		Renderer.render = function() {
+			renderer.render(scene, camera);
+		}; // render
 
-	camera = new THREE.PerspectiveCamera(
-		opts.fov || 45,
-		(opts.width || window.innerWidth) / (opts.height || window.innerHeight),
-		opts.near || 1,
-		opts.far || 1000
-	);
+		Renderer.add = function(mesh) {
+			scene.add(mesh);
+		}; // add
 
-	game.onresize(function(width, height) {
-		camera.aspect = width / height;
-		camera.updateProjectionMatrix();
-	}); // onresize
+		Renderer.remove = function(mesh) {
+			scene.remove(mesh);
+		}; // add
 
-	return camera;
-}; // renderCamera
+		Renderer.createCamera = function(opts) {
+			opts = opts || {};
 
-Renderer.createLight = function(opts) {
-	opts = opts || {};
+			camera = new THREE.PerspectiveCamera(
+				opts.fov || 45,
+				(opts.width || window.innerWidth) / (opts.height || window.innerHeight),
+				opts.near || 1,
+				opts.far || 1000
+			);
 
-	var light = new THREE.DirectionalLight(opts.color || 0xFFFFFF, opts.intensity || 1);
+			game.onresize(function(width, height) {
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+			}); // onresize
 
-	light.castShadow = (opts.shadow !== false);
-	//light.shadowDarkness = opts['shadow-darkness'] || 0.5;
+			return camera;
+		}; // renderCamera
 
-	//light.shadowCameraVisible = !!opts['shadow-camera'];
-	light.shadow.camera.top = opts['shadow-camera-top'] || 150;
-	light.shadow.camera.bottom = opts['shadow-camera-bottom'] || 150;
-	light.shadow.camera.left = opts['shadow-camera-left'] || 150;
-	light.shadow.camera.right = opts['shadow-camera-right'] || 150;
+		Renderer.createLight = function(opts) {
+			opts = opts || {};
 
-	return light;
-}; // createLight
+			var light = new THREE.DirectionalLight(opts.color || 0xFFFFFF, opts.intensity || 1);
 
-Renderer.createCube = function(opts) {
-	opts = opts || {};
+			light.castShadow = (opts.shadow !== false);
+			//light.shadowDarkness = opts['shadow-darkness'] || 0.5;
 
-	//var material = new THREE.MeshLambertMaterial({
-	var material = new THREE.MeshToonMaterial({
-		'color': opts.color || 0xFFFFFF
-	});
+			//light.shadowCameraVisible = !!opts['shadow-camera'];
+			light.shadow.camera.top = opts['shadow-camera-top'] || 150;
+			light.shadow.camera.bottom = opts['shadow-camera-bottom'] || 150;
+			light.shadow.camera.left = opts['shadow-camera-left'] || 150;
+			light.shadow.camera.right = opts['shadow-camera-right'] || 150;
 
-	var cube = new THREE.Mesh(
-		new THREE.BoxGeometry(
-			opts.width || 1,
-			opts.height || 1,
-			opts.depth || 1,
-			opts['width-segments'] || 1,
-			opts['height-segments'] || 1,
-			opts['depth-segments'] || 1
-		),
-		material
-	);
+			return light;
+		}; // createLight
 
-	return cube;
-}; // createCube
+		Renderer.createCube = function(opts) {
+			opts = opts || {};
 
-Renderer.createSphere = function(opts) {
-	opts = opts || {};
+			//var material = new THREE.MeshLambertMaterial({
+			var material = new THREE.MeshToonMaterial({
+				'color': opts.color || 0xFFFFFF
+			});
 
-	//var material = new THREE.MeshLambertMaterial({
-	var material = new THREE.MeshToonMaterial({
-		'color': opts.color || 0xFFFFFF
-	});
+			var cube = new THREE.Mesh(
+				new THREE.BoxGeometry(
+					opts.width || 1,
+					opts.height || 1,
+					opts.depth || 1,
+					opts['width-segments'] || 1,
+					opts['height-segments'] || 1,
+					opts['depth-segments'] || 1
+				),
+				material
+			);
 
-	var sphere = new THREE.Mesh(
-		new THREE.SphereGeometry(
-			opts.radius || 1,
-			opts['width-segments'] || 3,
-			opts['height-segments'] || 2
-		),
-		material
-	);
+			return cube;
+		}; // createCube
 
-	return sphere;
-}; // createSphere
+		Renderer.createSphere = function(opts) {
+			opts = opts || {};
 
-})(window.game, window.THREE);
+			//var material = new THREE.MeshLambertMaterial({
+			var material = new THREE.MeshToonMaterial({
+				'color': opts.color || 0xFFFFFF
+			});
+
+			var sphere = new THREE.Mesh(
+				new THREE.SphereGeometry(
+					opts.radius || 1,
+					opts['width-segments'] || 3,
+					opts['height-segments'] || 2
+				),
+				material
+			);
+
+			return sphere;
+		}; // createSphere
+
+		if (cb) {
+			cb();
+		}
+
+	}); // load
+
+}; // __init__
+
+})(window.game);
