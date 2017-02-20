@@ -2,23 +2,39 @@
 
 'use strict';
 
-var Obj = game.Obj;
+var Obj = game.Obj = game.Obj || {};
+var Sphere = Obj.Sphere = {};
 
-var Sphere = Obj.Sphere = function(opts) {
-	opts = opts || {};
+Sphere.__init__ = function(cb) {
+	delete Sphere.__init__;
 
-	Obj.call(this, opts);
+	game.load(['Renderer', 'Obj'], function() {
 
-	this.render(game.Renderer.createSphere({
-		'color': opts.color,
-		'radius': opts.radius,
-		'width-segments': opts['width-segments'],
-		'height-segments': opts['height-segments']
-	})); // render
+		Obj = game.Obj;
 
-	this.move(opts.x, opts.y, opts.z);
-}; // constructor
+		Sphere = Obj.Sphere = function(opts) {
+			opts = opts || {};
 
-Sphere.prototype = Object.create(Obj.prototype);
+			Obj.call(this, opts);
+
+			this.render(game.Renderer.createSphere({
+				'color': opts.color,
+				'radius': opts.radius,
+				'width-segments': opts['width-segments'],
+				'height-segments': opts['height-segments']
+			})); // render
+
+			this.move(opts.x, opts.y, opts.z);
+		}; // constructor
+
+		Sphere.prototype = Object.create(Obj.prototype);
+
+		if (cb) {
+			cb();
+		}
+
+	}); // load
+
+}; // __init__
 
 })(window.game);
