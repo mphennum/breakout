@@ -1,12 +1,12 @@
-(function() {
+(function(JSON) {
 
 'use strict';
 
 var game = window.game = {
 	'dev': true,
 	'over': false,
-	'extensions': ['Ext.Three'],
-	'modules': ['Renderer', 'Obj', 'Obj.Camera', 'Obj.Light', 'Obj.Cube', 'Obj.Sphere', 'Obj.Player', 'Obj.Ball', 'Obj.Brick', 'Obj.Wall', 'Obj.Background'],
+	'modulemap': {}, // 'Renderer': 'game', ...
+	'manifestmap': {}, // 'game': ['Renderer', ...]
 	'urlmap': {
 		'base': 'http://www.mphennum.com/work/breakout/'
 	},
@@ -20,8 +20,10 @@ var game = window.game = {
 var Obj;
 var Renderer;
 var objmap = game.objmap;
+var $head = game.elemap.$head;
 
 game.start = function() {
+	game.log('game.start');
 	var timer;
 	window.onresize = function() {
 		clearTimeout(timer);
@@ -47,9 +49,6 @@ game.start = function() {
 
 	var loop = function(ms) {
 		elapsed = ms - prev;
-		if (elapsed < 0) {
-			game.log(elapsed);
-		}
 
 		for (var k in objmap) {
 			objmap[k].update(elapsed);
@@ -129,22 +128,71 @@ game.remove = function(obj) {
 	}*/
 }; // remove
 
+// load
+
 var loadedmap = {};
-game.load = function(modules, cb) {
-	if (modules instanceof Array) {
-		var remaining = modules.length;
-		var ready = function() {
-			if (!--remaining && cb) {
+var loadingmap = {};
+var initializedmap = {};
+
+var modulemap = game.modulemap;
+var manifestmap = game.manifestmap;
+
+var loadImage = function(file, cb) {
+	var img = document.createElement('img');
+	img.addEventListener('load', cb);
+	img.src = 'img/' + file.replace(/\./g, '/').toLowerCase() + '.png';
+}; // loadImage
+
+var loadJSON = function(module, cb) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', 'json/' + module.replace(/\./g, '/').toLowerCase() + '.json', true);
+
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState === 4) {
+			var parts = module.split('.');
+			var part = game;
+			for (var i = 0, n = parts.length - 1; i < n; ++i) {
+				part = part[parts[i]] = part[parts[i]] || {};
+			}
+
+			part[parts[i]] = JSON.parse(xhr.responseText);
+
+			if (cb) {
 				cb();
 			}
-		}; // ready
+		}
+	}; // onreadystatechange
 
-		for (var i = 0; i < modules.length; ++i) {
-			game.load(modules[i], ready);
+	xhr.send(null);
+}; // loadJSON
+
+var loadJS = function(url, cb) {
+	if (/renderer/.test(url)) {
+		game.log('loadJS', url);
+	}
+
+	if (loadedmap[url]) {
+		if (cb) {
+			cb();
 		}
 
 		return;
 	}
+
+	if (loadingmap[url]) {
+		if (cb) {
+			loadingmap[url][loadingmap[url].length] = cb;
+		}
+
+		return;
+	}
+
+	loadingmap[url] = cb ? [cb] : [];
+
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.async = 'true';
+	script.src = url;
 
 	var done = false;
 	var ready = function() {
@@ -153,25 +201,191 @@ game.load = function(modules, cb) {
 		}
 
 		done = true;
-		if (cb) {
-			cb();
+
+		loadedmap[url] = true;
+		for (var i = 0, cbs = loadingmap[url]; i < cbs.length; ++i) {
+			cbs[i]();
+		}
+
+		delete loadingmap[url];
+
+		$head.removeChild(script);
+	}; // ready
+
+	script.onload = ready;
+	script.onreadystatechange = function() {
+		if (!done && this.readyState === 'loaded' || this.readyState === 'complete') {
+			ready();
+		}
+	}
+
+	$head.appendChild(script);
+}; // loadJS
+
+var initModule = function(module) {
+	game.log('initModule', module);
+	var ready = function(ns) {
+		var done = function() {
+			initializedmap[module] = true;
+			if (!loadingmap[module]) {
+				game.log('length of undefined?', loadingmap);
+			}
+			for (var i = 0, cbs = loadingmap[module]; i < cbs.length; ++i) {
+				cbs[i]();
+			}
+
+			delete loadingmap[module];
+		};
+
+		if (ns && ns.__init__) {
+			ns.__init__(done);
+		} else {
+			done();
 		}
 	}; // ready
 
-	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.async = 'true';
-	script.onload = ready;
-	script.onreadystatechange = function() {
-		if (this.readyState === 'loaded' || this.readyState === 'complete') {
-			ready();
-		}
-	}; // onreadystatechange
+	var ns = game;
+	for (var i = 0, parts = module.split('.'); i < parts.length; ++i) {
+		ns = ns[parts[i]];
+	}
 
-	modules = modules.toLowerCase().replace(/\./g, '/');
-	script.src = game.urlmap.base + 'js/' + modules + '.js';
-	game.elemap.$head.appendChild(script);
+	if (module === 'Renderer') {
+		game.log('ns', module.split('.'), ns);
+	}
+	ready(ns);
+}; // initModule
+
+var loadJSModule = function(module, cb) {
+	if (module === 'game') {
+		if (cb) {
+			cb();
+		}
+
+		return;
+	}
+
+	if (initializedmap[module]) {
+		if (cb) {
+			cb();
+		}
+
+		return;
+	}
+
+	if (loadedmap[module]) {
+		loadingmap[module] = loadingmap[module] || [];
+		if (cb) {
+			loadingmap[module][loadingmap[module].length] = cb;
+		}
+
+		initModule(module);
+		return;
+	}
+
+	if (loadingmap[module]) {
+		if (cb) {
+			loadingmap[module][loadingmap[module].length] = cb;
+		}
+
+		return;
+	}
+
+	var pkg = modulemap[module] || module;
+	var manifest = manifestmap[pkg]; // || undefined
+
+	if (manifest) {
+		for (var i = 0; i < manifest.length; ++i) {
+			loadingmap[manifest[i]] = [];
+		}
+	}
+
+	if (cb) {
+		loadingmap[module] = [cb];
+	}
+
+	loadJS('js/' + pkg.replace(/\./g, '/').toLowerCase() + '.js', function() {
+		if (manifest) {
+			for (var i = 0; i < manifest.length; ++i) {
+				var mod = manifest[i];
+				loadedmap[mod] = true;
+				if (loadingmap[mod]) {
+					if (loadingmap[mod].length) {
+						initModule(mod);
+					} else {
+						delete loadingmap[mod];
+					}
+				}
+			}
+		} else {
+			loadedmap[module] = true;
+			initModule(module);
+		}
+	}); // loadJS
+}; // loadJSModule
+
+var loadJSExt = function(ext, cb) {
+	if (loadedmap[ext]) {
+		if (cb) {
+			cb();
+		}
+
+		return;
+	}
+
+	if (loadingmap[ext]) {
+		if (cb) {
+			loadingmap[ext][loadingmap[ext].length] = cb;
+		}
+
+		return;
+	}
+
+	loadingmap[ext] = cb ? [cb] : [];
+
+	loadJS('js/' + ext.replace(/\./g, '/').toLowerCase() + '.js', function() {
+		loadedmap[ext] = true;
+		for (var i = 0, cbs = loadingmap[ext]; i < cbs.length; ++i) {
+			cbs[i]();
+		}
+
+		delete loadingmap[ext];
+	}); // loadJS
+}; // loadJSExt
+
+game.load = function(module, cb) {
+	if (arguments.length < 2) {
+		cb = module;
+		module = 'game';
+	}
+
+	if (module instanceof Array) {
+		var remaining = module.length;
+		var ready = function() {
+			if (!--remaining && cb) {
+				cb();
+			}
+		}; // ready
+
+		for (var i = 0; i < module.length; ++i) {
+			game.load(module[i], ready);
+		}
+
+		return;
+	}
+
+	var type = module.split('.')[0];
+	if (type === 'Ext') { // js ext
+		loadJSExt(module, cb);
+	} else if (type === 'JSON') { // json files (maps, etc)
+		loadJSON(module, cb);
+	} else if (type === 'IMG') { // image files
+		loadImage(module, cb);
+	} else { // js module
+		loadJSModule(module, cb);
+	}
 }; // load
+
+// other
 
 var resizecbs = [];
 game.onresize = function(cb) {
@@ -185,6 +399,6 @@ game.log = function() {
 }; // log
 
 // init
-game.load(game.extensions, game.load.bind(game, game.modules, game.start));
+game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player'/*, 'Obj.Ball', 'Obj.Brick', 'Obj.Wall', 'Obj.Background'*/], game.start);
 
-})();
+})(window.JSON);
