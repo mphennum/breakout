@@ -2,28 +2,44 @@
 
 'use strict';
 
-var Obj = game.Obj;
+var Obj = game.Obj = game.Obj || {};
+var Camera = Obj.Camera = {};
 
-var Camera = Obj.Camera = function(opts) {
-	opts = opts || {};
+Camera.__init__ = function(cb) {
+	delete Camera.__init__;
 
-	Obj.call(this, opts);
+	game.load(['Renderer', 'Obj'], function() {
 
-	this.render(game.Renderer.createCamera({
-		'fov': opts.fov,
-		'width': opts.width,
-		'height': opts.height,
-		'near': opts.near,
-		'far': opts.far
-	})); // render
+		Obj = game.Obj;
 
-	this.move(opts.x, opts.y, opts.z);
-}; // constructor
+		Camera = Obj.Camera = function(opts) {
+			opts = opts || {};
 
-Camera.prototype = Object.create(Obj.prototype);
+			Obj.call(this, opts);
 
-/*Camera.prototype.update = function(elapsed) {
+			this.render(game.Renderer.createCamera({
+				'fov': opts.fov,
+				'width': opts.width,
+				'height': opts.height,
+				'near': opts.near,
+				'far': opts.far
+			})); // render
 
-};*/ // update
+			this.move(opts.x, opts.y, opts.z);
+		}; // constructor
+
+		Camera.prototype = Object.create(Obj.prototype);
+
+		/*Camera.prototype.update = function(elapsed) {
+
+		};*/ // update
+
+		if (cb) {
+			cb();
+		}
+
+	}); // load
+
+}; // __init__
 
 })(window.game);
