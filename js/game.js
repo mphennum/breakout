@@ -53,6 +53,9 @@ game.start = function() {
 	var player = new Obj.Player({'y': bounds.y[0] + 4});
 	player.render();
 
+	var ball = new Obj.Ball();
+	ball.render();
+
 	// walls
 
 	var walls = [
@@ -145,6 +148,7 @@ game.rand = function(min, max, decimal) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }; // rand
 
+/*
 var idchars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 var idcharslen = idchars.length;
 var lastid = null;
@@ -179,34 +183,22 @@ game.genID = function() {
 	lastid = id;
 	return id;
 }; // genID
+*/
 
 game.add = function(obj) {
 	if (obj.update) {
-		obj.id = game.genID();
-		objmap[obj.id] = obj;
+		objmap[obj.mesh.id] = obj;
 	}
 
-	if (obj.mesh) {
-		Renderer.add(obj.mesh);
-	}/* else if (obj.children) {
-		for (var i = 0, children = obj.children; i < children.length; ++i) {
-			Renderer.add(children[i]);
-		}
-	}*/
+	Renderer.add(obj.mesh);
 }; // add
 
 game.remove = function(obj) {
-	if (obj.id) {
-		delete objmap[obj.id];
+	if (obj.update) {
+		delete objmap[obj.mesh.id];
 	}
 
-	if (obj.mesh) {
-		Renderer.remove(obj.mesh);
-	}/* else if (obj.children) {
-		for (var i = 0, children = obj.children; i < children.length; ++i) {
-			Renderer.remove(children[i]);
-		}
-	}*/
+	Renderer.remove(obj.mesh);
 }; // remove
 
 // load
@@ -474,7 +466,7 @@ game.log = function() {
 
 // init
 game.load('Ext.THREE', function() {
-	game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick'/*, 'Obj.Ball', 'Obj.Background'*/], game.start);
+	game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick', 'Obj.Ball'/*, 'Obj.Background'*/], game.start);
 }); // load
 
 })(window.JSON);
