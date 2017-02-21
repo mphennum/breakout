@@ -5,11 +5,9 @@
 var Renderer = game.Renderer = {};
 
 Renderer.__init__ = function(cb) {
-	game.log('Renderer.__init__');
 	delete Renderer.__init__;
 
-	game.load('Ext.THREE', function() {
-		game.log('Renderer ready after load (THREE)');
+	game.load(/*'Ext.THREE', */function() {
 
 		var THREE = window.THREE;
 

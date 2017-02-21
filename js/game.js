@@ -23,7 +23,6 @@ var objmap = game.objmap;
 var $head = game.elemap.$head;
 
 game.start = function() {
-	game.log('game.start');
 	var timer;
 	window.onresize = function() {
 		clearTimeout(timer);
@@ -167,10 +166,6 @@ var loadJSON = function(module, cb) {
 }; // loadJSON
 
 var loadJS = function(url, cb) {
-	if (/renderer/.test(url)) {
-		game.log('loadJS', url);
-	}
-
 	if (loadedmap[url]) {
 		if (cb) {
 			cb();
@@ -223,19 +218,17 @@ var loadJS = function(url, cb) {
 }; // loadJS
 
 var initModule = function(module) {
-	game.log('initModule', module);
 	var ready = function(ns) {
 		var done = function() {
 			initializedmap[module] = true;
-			if (!loadingmap[module]) {
-				game.log('length of undefined?', loadingmap);
-			}
+
 			for (var i = 0, cbs = loadingmap[module]; i < cbs.length; ++i) {
 				cbs[i]();
 			}
 
+			delete loadedmap[module];
 			delete loadingmap[module];
-		};
+		}; // done
 
 		if (ns && ns.__init__) {
 			ns.__init__(done);
@@ -249,9 +242,6 @@ var initModule = function(module) {
 		ns = ns[parts[i]];
 	}
 
-	if (module === 'Renderer') {
-		game.log('ns', module.split('.'), ns);
-	}
 	ready(ns);
 }; // initModule
 
@@ -291,11 +281,11 @@ var loadJSModule = function(module, cb) {
 	}
 
 	var pkg = modulemap[module] || module;
-	var manifest = manifestmap[pkg]; // || undefined
+	var modules = manifestmap[pkg]; // || undefined
 
-	if (manifest) {
-		for (var i = 0; i < manifest.length; ++i) {
-			loadingmap[manifest[i]] = [];
+	if (modules) {
+		for (var i = 0; i < modules.length; ++i) {
+			loadingmap[modules[i]] = [];
 		}
 	}
 
@@ -304,9 +294,9 @@ var loadJSModule = function(module, cb) {
 	}
 
 	loadJS('js/' + pkg.replace(/\./g, '/').toLowerCase() + '.js', function() {
-		if (manifest) {
-			for (var i = 0; i < manifest.length; ++i) {
-				var mod = manifest[i];
+		if (modules) {
+			for (var i = 0; i < modules.length; ++i) {
+				var mod = modules[i];
 				loadedmap[mod] = true;
 				if (loadingmap[mod]) {
 					if (loadingmap[mod].length) {
@@ -316,10 +306,12 @@ var loadJSModule = function(module, cb) {
 					}
 				}
 			}
-		} else {
-			loadedmap[module] = true;
-			initModule(module);
+
+			return;
 		}
+
+		loadedmap[module] = true;
+		initModule(module);
 	}); // loadJS
 }; // loadJSModule
 
@@ -399,6 +391,8 @@ game.log = function() {
 }; // log
 
 // init
-game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player'/*, 'Obj.Ball', 'Obj.Brick', 'Obj.Wall', 'Obj.Background'*/], game.start);
+game.load('Ext.THREE', function() {
+	game.load(['Renderer', 'Obj.Camera', 'Obj.Light'/*, 'Obj.Player'*//*, 'Obj.Ball', 'Obj.Brick', 'Obj.Wall', 'Obj.Background'*/], game.start);
+}); // load
 
 })(window.JSON);
