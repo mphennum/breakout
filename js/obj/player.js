@@ -10,18 +10,26 @@ Player.__init__ = function(cb) {
 
 	game.load(['Renderer', 'Obj', 'Obj.Cube'], function() {
 
+		var Renderer = game.Renderer;
 		Obj = game.Obj;
 
-		var Cube = Obj.Cube;
+		var parent = Obj.Cube;
 
 		Player = Obj.Player = function(opts) {
-			Cube.call(this, opts);
+			opts = opts || {};
+
+			opts.width = opts.width || 10;
+			opts.height = opts.height || 2;
+			opts.depth = opts.depth || 2;
+
+			parent.call(this, opts);
 		}; // constructor
 
-		Player.prototype = Object.create(Cube.prototype);
+		Player.prototype = Object.create(parent.prototype);
 
 		Player.prototype.update = function(elapsed) {
-
+			//this.move(game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true));
+			//this.move(0.1, 0, 0);
 		}; // update
 
 		if (cb) {
