@@ -10,29 +10,40 @@ Light.__init__ = function(cb) {
 
 	game.load(['Renderer', 'Obj'], function() {
 
-		Obj = game.Obj;
+		var Renderer = game.Renderer;
+		var parent = Obj = game.Obj;
 
 		Light = Obj.Light = function(opts) {
 			opts = opts || {};
 
-			Obj.call(this, opts);
+			parent.call(this, opts);
 
-			this.render(game.Renderer.createLight({
-				'color': opts.color,
-				'intensity': opts.intensity,
-				'shadow': opts.shadow,
-				'shadow-darkness': opts['shadow-darkness'],
-				'shadow-camera': opts['shadow-camera'],
-				'shadow-camera-top': opts['shadow-camera-top'],
-				'shadow-camera-bottom': opts['shadow-camera-bottom'],
-				'shadow-camera-left': opts['shadow-camera-left'],
-				'shadow-camera-right': opts['shadow-camera-right']
-			})); // render
-
-			this.move(opts.x, opts.y, opts.z);
+			this.color = opts.color || Renderer.DEFAULT_COLOR;
+			this.intensity = opts.intensity;
+			this.shadow = opts.shadow;
+			this.shadowdarkness = opts['shadow-darkness'];
+			this.shadowcamera = opts['shadow-camera'];
+			this.shadowcameratop = opts['shadow-camera-top'];
+			this.shadowcamerabottom = opts['shadow-camera-bottom'];
+			this.shadowcameraleft = opts['shadow-camera-left'];
+			this.shadowcameraright = opts['shadow-camera-right'];
 		}; // constructor
 
-		Light.prototype = Object.create(Obj.prototype);
+		Light.prototype = Object.create(parent.prototype);
+
+		Light.prototype.render = function() {
+			parent.prototype.render.call(this, Renderer.createLight({
+				'color': this.color,
+				'intensity': this.intensity,
+				'shadow': this.shadow,
+				'shadow-darkness': this.shadowdarkness,
+				'shadow-camera': this.shadowcamera,
+				'shadow-camera-top': this.shadowcameratop,
+				'shadow-camera-bottom': this.shadowcamerabottom,
+				'shadow-camera-left': this.shadowcameraleft,
+				'shadow-camera-right': this.shadowcameraright
+			})); // render
+		}; // render
 
 		if (cb) {
 			cb();
