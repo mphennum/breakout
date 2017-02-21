@@ -392,7 +392,7 @@ game.log = function() {
 
 // init
 game.load('Ext.THREE', function() {
-	game.load(['Renderer', 'Obj.Camera', 'Obj.Light'/*, 'Obj.Player'*//*, 'Obj.Ball', 'Obj.Brick', 'Obj.Wall', 'Obj.Background'*/], game.start);
+	game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player'/*, 'Obj.Ball', 'Obj.Brick', 'Obj.Wall', 'Obj.Background'*/], game.start);
 }); // load
 
 })(window.JSON);
