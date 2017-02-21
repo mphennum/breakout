@@ -15,6 +15,8 @@ Renderer.__init__ = function(cb) {
 		var renderer;
 		var camera;
 
+		Renderer.MATERIAL = THREE.MeshPhongMaterial; // MeshLambertMaterial, MeshToonMaterial
+
 		Renderer.DEFAULT_FOV = 45;
 		Renderer.DEFAULT_NEAR = 0.1;
 		Renderer.DEFAULT_FAR = 250; // old was 1000
@@ -31,8 +33,8 @@ Renderer.__init__ = function(cb) {
 		Renderer.DEFAULT_CUBE_SEGMENTS = 1;
 
 		Renderer.DEFAULT_SPHERE_RADIUS = 1;
-		Renderer.DEFAULT_SPHERE_SEGMENTS_WIDTH = 3;
-		Renderer.DEFAULT_SPHERE_SEGMENTS_HEIGHT = 2;
+		Renderer.DEFAULT_SPHERE_SEGMENTS_WIDTH = 25;
+		Renderer.DEFAULT_SPHERE_SEGMENTS_HEIGHT = 25;
 
 		Renderer.init = function(opts) {
 			opts = opts || {};
@@ -118,8 +120,7 @@ Renderer.__init__ = function(cb) {
 		Renderer.createCube = function(opts) {
 			opts = opts || {};
 
-			//var material = new THREE.MeshLambertMaterial({
-			var material = new THREE.MeshToonMaterial({'color': opts.color || Renderer.DEFAULT_COLOR});
+			var material = new Renderer.MATERIAL({'color': opts.color || Renderer.DEFAULT_COLOR});
 
 			var cube = new THREE.Mesh(
 				new THREE.BoxGeometry(
@@ -139,8 +140,7 @@ Renderer.__init__ = function(cb) {
 		Renderer.createSphere = function(opts) {
 			opts = opts || {};
 
-			//var material = new THREE.MeshLambertMaterial({
-			var material = new THREE.MeshToonMaterial({'color': opts.color || Renderer.DEFAULT_COLOR});
+			var material = new Renderer.MATERIAL({'color': opts.color || Renderer.DEFAULT_COLOR});
 
 			var sphere = new THREE.Mesh(
 				new THREE.SphereGeometry(
