@@ -7,10 +7,16 @@ var Obj = game.Obj = {};
 Obj.__init__ = function(cb) {
 	delete Obj.__init__;
 
-	game.load(function() {
+	game.load('Renderer', function() {
+
+		var Renderer = game.Renderer;
 
 		Obj = game.Obj = function(opts) {
-			//opts = opts || {};
+			opts = opts || {};
+
+			this.x = opts.x || Renderer.DEFAULT_X;
+			this.y = opts.y || Renderer.DEFAULT_Y;
+			this.z = opts.z || Renderer.DEFAULT_Z;
 
 			this.mesh = null;
 		}; // constructor
@@ -20,6 +26,8 @@ Obj.__init__ = function(cb) {
 		Obj.prototype.render = function(mesh) {
 			this.mesh = mesh || null;
 			game.add(this);
+
+			this.move(this.x, this.y, this.z);
 		}; // render
 
 		Obj.prototype.move = function(x, y, z) {
