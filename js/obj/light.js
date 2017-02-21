@@ -18,7 +18,7 @@ Light.__init__ = function(cb) {
 
 			opts.x = opts.x || Renderer.DEFAULT_X;
 			opts.x = opts.x || Renderer.DEFAULT_Y;
-			opts.z = opts.z || 100;
+			opts.z = opts.z || 3;
 
 			parent.call(this, opts);
 
