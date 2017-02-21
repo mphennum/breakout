@@ -16,6 +16,10 @@ Camera.__init__ = function(cb) {
 		Camera = Obj.Camera = function(opts) {
 			opts = opts || {};
 
+			opts.x = opts.x || Renderer.DEFAULT_X;
+			opts.y = opts.y || Renderer.DEFAULT_Y;
+			opts.z = opts.z || Renderer.DEFAULT_FAR;
+
 			parent.call(this, opts);
 
 			this.width = opts.width || null;
@@ -38,11 +42,11 @@ Camera.__init__ = function(cb) {
 			})); // render
 		}; // render
 
-		/*Camera.prototype.update = function(elapsed) {
+		Camera.prototype.update = function(elapsed) {
 			//this.move(0.1, 0, 0);
 			//this.move(0, 0.1, 0);
 			//this.move(0, 0, 0.1);
-		};*/ // update
+		}; // update
 
 		if (cb) {
 			cb();
