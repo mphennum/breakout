@@ -16,8 +16,8 @@ Renderer.__init__ = function(cb) {
 		var camera;
 
 		Renderer.DEFAULT_FOV = 45;
-		Renderer.DEFAULT_NEAR = 1;
-		Renderer.DEFAULT_FAR = 150; // old was 1000
+		Renderer.DEFAULT_NEAR = 0.1;
+		Renderer.DEFAULT_FAR = 250; // old was 1000
 
 		Renderer.DEFAULT_COLOR = 0xFFFFFF;
 
@@ -100,16 +100,17 @@ Renderer.__init__ = function(cb) {
 		Renderer.createLight = function(opts) {
 			opts = opts || {};
 
-			var light = new THREE.DirectionalLight(opts.color || Renderer.DEFAULT_COLOR, opts.intensity || 1);
+			var light = new THREE.DirectionalLight(opts.color || Renderer.DEFAULT_COLOR, opts.intensity || 2);
 
 			light.castShadow = (opts.shadow !== false);
 			//light.shadowDarkness = opts['shadow-darkness'] || 0.5;
 
 			//light.shadowCameraVisible = !!opts['shadow-camera'];
-			light.shadow.camera.top = opts['shadow-camera-top'] || 150;
-			light.shadow.camera.bottom = opts['shadow-camera-bottom'] || 150;
-			light.shadow.camera.left = opts['shadow-camera-left'] || 150;
-			light.shadow.camera.right = opts['shadow-camera-right'] || 150;
+			var far = Renderer.DEFAULT_FAR * 1.5;
+			light.shadow.camera.top = opts['shadow-camera-top'] || far;
+			light.shadow.camera.bottom = opts['shadow-camera-bottom'] || -far;
+			light.shadow.camera.left = opts['shadow-camera-left'] || -far;
+			light.shadow.camera.right = opts['shadow-camera-right'] || far;
 
 			return light;
 		}; // createLight
