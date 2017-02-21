@@ -19,6 +19,8 @@ Wall.__init__ = function(cb) {
 			opts = opts || {};
 
 			parent.call(this, opts);
+
+			this.bottom = !!opts.bottom;
 		}; // constructor
 
 		Wall.prototype = Object.create(parent.prototype);
