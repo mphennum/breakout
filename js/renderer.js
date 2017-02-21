@@ -15,6 +15,25 @@ Renderer.__init__ = function(cb) {
 		var renderer;
 		var camera;
 
+		Renderer.DEFAULT_FOV = 45;
+		Renderer.DEFAULT_NEAR = 1;
+		Renderer.DEFAULT_FAR = 150; // old was 1000
+
+		Renderer.DEFAULT_COLOR = 0xFFFFFF;
+
+		Renderer.DEFAULT_X = 0;
+		Renderer.DEFAULT_Y = 0;
+		Renderer.DEFAULT_Z = 0;
+
+		Renderer.DEFAULT_CUBE_WIDTH = 1;
+		Renderer.DEFAULT_CUBE_HEIGHT = 1;
+		Renderer.DEFAULT_CUBE_DEPTH = 1;
+		Renderer.DEFAULT_CUBE_SEGMENTS = 1;
+
+		Renderer.DEFAULT_SPHERE_RADIUS = 1;
+		Renderer.DEFAULT_SPHERE_SEGMENTS_WIDTH = 3;
+		Renderer.DEFAULT_SPHERE_SEGMENTS_HEIGHT = 2;
+
 		Renderer.init = function(opts) {
 			opts = opts || {};
 
@@ -31,9 +50,9 @@ Renderer.__init__ = function(cb) {
 			renderer.shadowMap.soft = true;
 			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-			renderer.shadowCameraNear = opts['shadow-near'] || 1;
-			renderer.shadowCameraFar = opts['shadow-far'] || 1000;
-			renderer.shadowCameraFov = opts['shadow-fov'] || 45;
+			renderer.shadowCameraNear = opts['shadow-near'] || Renderer.DEFAULT_NEAR;
+			renderer.shadowCameraFar = opts['shadow-far'] || Renderer.DEFAULT_FAR;
+			renderer.shadowCameraFov = opts['shadow-fov'] || Renderer.DEFAULT_FOV;
 
 			renderer.shadowMapBias = 0.002;
 			renderer.shadowMapDarkness = 0.5;
@@ -62,16 +81,18 @@ Renderer.__init__ = function(cb) {
 			opts = opts || {};
 
 			camera = new THREE.PerspectiveCamera(
-				opts.fov || 45,
+				opts.fov || Renderer.DEFAULT_FOV,
 				(opts.width || window.innerWidth) / (opts.height || window.innerHeight),
-				opts.near || 1,
-				opts.far || 1000
+				opts.near || Renderer.DEFAULT_NEAR,
+				opts.far || Renderer.DEFAULT_FAR
 			);
 
-			game.onresize(function(width, height) {
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
-			}); // onresize
+			if (!opts.width && !opts.height) {
+				game.onresize(function(width, height) {
+					camera.aspect = width / height;
+					camera.updateProjectionMatrix();
+				}); // onresize
+			}
 
 			return camera;
 		}; // renderCamera
@@ -79,7 +100,7 @@ Renderer.__init__ = function(cb) {
 		Renderer.createLight = function(opts) {
 			opts = opts || {};
 
-			var light = new THREE.DirectionalLight(opts.color || 0xFFFFFF, opts.intensity || 1);
+			var light = new THREE.DirectionalLight(opts.color || Renderer.DEFAULT_COLOR, opts.intensity || 1);
 
 			light.castShadow = (opts.shadow !== false);
 			//light.shadowDarkness = opts['shadow-darkness'] || 0.5;
@@ -97,18 +118,16 @@ Renderer.__init__ = function(cb) {
 			opts = opts || {};
 
 			//var material = new THREE.MeshLambertMaterial({
-			var material = new THREE.MeshToonMaterial({
-				'color': opts.color || 0xFFFFFF
-			});
+			var material = new THREE.MeshToonMaterial({'color': opts.color || Renderer.DEFAULT_COLOR});
 
 			var cube = new THREE.Mesh(
 				new THREE.BoxGeometry(
-					opts.width || 1,
-					opts.height || 1,
-					opts.depth || 1,
-					opts['width-segments'] || 1,
-					opts['height-segments'] || 1,
-					opts['depth-segments'] || 1
+					opts.width || Renderer.DEFAULT_CUBE_WIDTH,
+					opts.height || Renderer.DEFAULT_CUBE_HEIGHT,
+					opts.depth || Renderer.DEFAULT_CUBE_DEPTH,
+					opts['width-segments'] || Renderer.DEFAULT_CUBE_SEGMENTS,
+					opts['height-segments'] || Renderer.DEFAULT_CUBE_SEGMENTS,
+					opts['depth-segments'] || Renderer.DEFAULT_CUBE_SEGMENTS
 				),
 				material
 			);
@@ -120,15 +139,13 @@ Renderer.__init__ = function(cb) {
 			opts = opts || {};
 
 			//var material = new THREE.MeshLambertMaterial({
-			var material = new THREE.MeshToonMaterial({
-				'color': opts.color || 0xFFFFFF
-			});
+			var material = new THREE.MeshToonMaterial({'color': opts.color || Renderer.DEFAULT_COLOR});
 
 			var sphere = new THREE.Mesh(
 				new THREE.SphereGeometry(
-					opts.radius || 1,
-					opts['width-segments'] || 3,
-					opts['height-segments'] || 2
+					opts.radius || Renderer.DEFAULT_SPHERE_RADIUS,
+					opts['width-segments'] || Renderer.DEFAULT_SPHERE_SEGMENTS_WIDTH,
+					opts['height-segments'] || Renderer.DEFAULT_SPHERE_SEGMENTS_HEIGHT
 				),
 				material
 			);
