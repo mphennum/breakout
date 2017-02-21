@@ -69,7 +69,8 @@ game.start = function() {
 			'y': bounds.y[0],
 			'width': bounds.x[1] - bounds.x[0] + 2,
 			'height': 2,
-			'depth': 2
+			'depth': 2,
+			'bottom': true
 		}),
 		new Obj.Wall({
 			'x': bounds.x[0],
@@ -93,12 +94,12 @@ game.start = function() {
 
 	var Brick = Obj.Brick;
 	var bricky = bounds.y[1] - Brick.DEFAULT_HEIGHT * 10;
-	var brickcols = Math.floor((bounds.x[1] - bounds.x[0] - Brick.DEFAULT_WIDTH) / Brick.DEFAULT_WIDTH);
+	var brickcols = Math.floor((bounds.x[1] - bounds.x[0] - Brick.DEFAULT_WIDTH) / (Brick.DEFAULT_WIDTH + 0.5));
 	var brickrowcolors = [0xAA33AA, 0xAA2233, 0xAAAA33, 0x22AA33, 0x33AAAA, 0x2233AA];
 
 	for (var ri = 0; ri < brickrowcolors.length; ++ri) {
 		var color = brickrowcolors[ri];
-		var brickx = bounds.x[1] - brickcols * Brick.DEFAULT_WIDTH;
+		var brickx = bounds.x[1] - brickcols * (Brick.DEFAULT_WIDTH + 0.5) - 2;
 		for (var ci = 0; ci < brickcols; ++ci) {
 			var brick = new Brick({
 				'color': color,
@@ -108,10 +109,10 @@ game.start = function() {
 
 			brick.render();
 
-			brickx += Brick.DEFAULT_WIDTH;
+			brickx += Brick.DEFAULT_WIDTH + 0.5;
 		}
 
-		bricky -= Brick.DEFAULT_HEIGHT + 1;
+		bricky -= Brick.DEFAULT_HEIGHT + 0.5;
 	}
 
 	// loop
