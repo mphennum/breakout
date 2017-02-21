@@ -14,13 +14,19 @@ var game = window.game = {
 		'$head': document.getElementsByTagName('head')[0],
 		'$body': document.getElementsByTagName('body')[0]
 	},
-	'objmap': {}
+	'objmap': {},
+	'bounds': {
+		'x': [-150, 150],
+		'y': [-100, 100],
+		'z': [-1, 1]
+	}
 };
 
 var Obj;
 var Renderer;
 var objmap = game.objmap;
 var $head = game.elemap.$head;
+var bounds = game.bounds;
 
 game.start = function() {
 	var timer;
@@ -44,16 +50,51 @@ game.start = function() {
 	var light = new Obj.Light();
 	light.render();
 
-	var player = new Obj.Player();
+	var player = new Obj.Player({
+		'y': bounds.y[0] + 4
+	});
+
 	player.render();
 
-	for (var i = 0; i < 1000; ++i) {
-		(new Obj.Player({
-			'x': game.rand(-100, 100),
-			'y': game.rand(-100, 100),
-			'z': game.rand(-100, 100)
-		})).render();
-	}
+	// walls
+
+	var walls = [];
+
+	walls[0] = new Obj.Wall({
+		'y': bounds.y[1],
+		'width': bounds.x[1] - bounds.x[0] + 2,
+		'height': 2,
+		'depth': 2
+	});
+
+	walls[0].render();
+
+	walls[1] = new Obj.Wall({
+		'y': bounds.y[0],
+		'width': bounds.x[1] - bounds.x[0] + 2,
+		'height': 2,
+		'depth': 2
+	});
+
+	walls[1].render();
+
+	walls[2] = new Obj.Wall({
+		'x': bounds.x[0],
+		'width': 2,
+		'height': bounds.y[1] - bounds.y[0] + 2,
+		'depth': 2
+	});
+
+	walls[2].render();
+
+	walls[3] = new Obj.Wall({
+		'x': bounds.x[1],
+		'width': 2,
+		'height': bounds.y[1] - bounds.y[0] + 2,
+		'depth': 2
+	});
+
+	walls[3].render();
 
 	// loop
 
@@ -418,7 +459,7 @@ game.log = function() {
 
 // init
 game.load('Ext.THREE', function() {
-	game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player'/*, 'Obj.Ball', 'Obj.Brick', 'Obj.Wall', 'Obj.Background'*/], game.start);
+	game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall'/*, 'Obj.Ball', 'Obj.Brick', 'Obj.Background'*/], game.start);
 }); // load
 
 })(window.JSON);
