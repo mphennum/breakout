@@ -10,27 +10,36 @@ Cube.__init__ = function(cb) {
 
 	game.load(['Renderer', 'Obj'], function() {
 
-		Obj = game.Obj;
+		var Renderer = game.Renderer;
+		var parent = Obj = game.Obj;
 
 		Cube = Obj.Cube = function(opts) {
 			opts = opts || {};
 
-			Obj.call(this, opts);
+			parent.call(this, opts);
 
-			this.render(game.Renderer.createCube({
-				'color': opts.color,
-				'width': opts.width,
-				'height': opts.height,
-				'depth': opts.depth,
-				'width-segments': opts['width-segments'],
-				'height-segments': opts['height-segments'],
-				'depth-segments': opts['depth-segments']
-			})); // render
-
-			this.move(opts.x, opts.y, opts.z);
+			this.color = opts.color || Renderer.DEFAULT_COLOR;
+			this.width = opts.width || Renderer.DEFAULT_CUBE_WIDTH;
+			this.height = opts.height || Renderer.DEFAULT_CUBE_HEIGHT;
+			this.depth = opts.depth || Renderer.DEFAULT_CUBE_DEPTH;
+			this.widthsegments = opts['width-segments'] || Renderer.DEFAULT_CUBE_SEGMENTS;
+			this.heightsegments = opts['height-segments'] || Renderer.DEFAULT_CUBE_SEGMENTS;
+			this.depthsegments = opts['depth-segments'] || Renderer.DEFAULT_CUBE_SEGMENTS;
 		}; // constructor
 
-		Cube.prototype = Object.create(Obj.prototype);
+		Cube.prototype = Object.create(parent.prototype);
+
+		Cube.prototype.render = function() {
+			parent.prototype.render.call(this, Renderer.createCube({
+				'color': this.color,
+				'width': this.width,
+				'height': this.height,
+				'depth': this.depth,
+				'width-segments': this.widthsegments,
+				'height-segments': this.heightsegments,
+				'depth-segments': this.depthsegments
+			})); // render
+		}; // render
 
 		if (cb) {
 			cb();
