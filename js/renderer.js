@@ -102,7 +102,7 @@ Renderer.__init__ = function(cb) {
 		Renderer.createLight = function(opts) {
 			opts = opts || {};
 
-			var light = new THREE.DirectionalLight(opts.color || Renderer.DEFAULT_COLOR, opts.intensity || 2);
+			var light = new THREE.DirectionalLight(opts.color || Renderer.DEFAULT_COLOR, opts.intensity || 1);
 
 			light.castShadow = (opts.shadow !== false);
 			//light.shadowDarkness = opts['shadow-darkness'] || 0.5;
