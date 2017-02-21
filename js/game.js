@@ -39,7 +39,21 @@ game.start = function() {
 	Renderer.init();
 
 	var camera = new Obj.Camera();
+	camera.render();
+
 	var light = new Obj.Light();
+	light.render();
+
+	var player = new Obj.Player();
+	player.render();
+
+	for (var i = 0; i < 1000; ++i) {
+		(new Obj.Player({
+			'x': game.rand(-100, 100),
+			'y': game.rand(-100, 100),
+			'z': game.rand(-100, 100)
+		})).render();
+	}
 
 	// loop
 
@@ -62,6 +76,18 @@ game.start = function() {
 	prev = window.performance.now();
 	setTimeout(loop.bind(prev), 1);
 }; // start
+
+game.rand = function(min, max, decimal) {
+	if (min instanceof Array) {
+		return min[Math.rand(0, min.length - 1)];
+	}
+
+	if (decimal) {
+		return (min + (Math.random() * (max - min)))
+	}
+
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}; // rand
 
 var idchars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 var idcharslen = idchars.length;
