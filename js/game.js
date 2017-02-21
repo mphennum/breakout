@@ -16,7 +16,7 @@ var game = window.game = {
 	},
 	'objmap': {},
 	'bounds': {
-		'x': [-150, 150],
+		'x': [-160, 160],
 		'y': [-100, 100],
 		'z': [-1, 1]
 	}
@@ -95,6 +95,31 @@ game.start = function() {
 	});
 
 	walls[3].render();
+
+	// bricks
+
+	var Brick = Obj.Brick;
+	var bricky = bounds.y[1] - Brick.DEFAULT_HEIGHT * 10;
+	var brickcols = Math.floor((bounds.x[1] - bounds.x[0] - Brick.DEFAULT_WIDTH) / Brick.DEFAULT_WIDTH);
+	var brickrowcolors = [0xAA33AA, 0xAA2233, 0xAAAA33, 0x22AA33, 0x33AAAA, 0x2233AA];
+
+	for (var ri = 0; ri < brickrowcolors.length; ++ri) {
+		var color = brickrowcolors[ri];
+		var brickx = bounds.x[1] - brickcols * Brick.DEFAULT_WIDTH;
+		for (var ci = 0; ci < brickcols; ++ci) {
+			var brick = new Brick({
+				'color': color,
+				'x': brickx,
+				'y': bricky
+			});
+
+			brick.render();
+
+			brickx += Brick.DEFAULT_WIDTH;
+		}
+
+		bricky -= Brick.DEFAULT_HEIGHT + 1;
+	}
 
 	// loop
 
@@ -459,7 +484,7 @@ game.log = function() {
 
 // init
 game.load('Ext.THREE', function() {
-	game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall'/*, 'Obj.Ball', 'Obj.Brick', 'Obj.Background'*/], game.start);
+	game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick'/*, 'Obj.Ball', 'Obj.Background'*/], game.start);
 }); // load
 
 })(window.JSON);
