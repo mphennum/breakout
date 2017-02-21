@@ -18,18 +18,20 @@ Ball.__init__ = function(cb) {
 		Ball = Obj.Ball = function(opts) {
 			opts = opts || {};
 
-			opts.radius = opts.radius || Ball.DEFAULT_RADIUS;
+			opts.radius = opts.radius || 5;
 
 			parent.call(this, opts);
+
+			this.speed = opts.speed || 0.25;
+			this.dir = opts.dir || Math.PI * 1.5; // down
 		}; // constructor
 
 		Ball.prototype = Object.create(parent.prototype);
 
-		Ball.DEFAULT_RADIUS = 10;
-
 		Ball.prototype.update = function(elapsed) {
 			//this.move(game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true));
 			//this.move(0.1, 0, 0);
+			this.move(0, -this.speed, 0);
 		}; // update
 
 		if (cb) {
