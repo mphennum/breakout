@@ -50,51 +50,41 @@ game.start = function() {
 	var light = new Obj.Light();
 	light.render();
 
-	var player = new Obj.Player({
-		'y': bounds.y[0] + 4
-	});
-
+	var player = new Obj.Player({'y': bounds.y[0] + 4});
 	player.render();
 
 	// walls
 
-	var walls = [];
+	var walls = [
+		new Obj.Wall({
+			'y': bounds.y[1],
+			'width': bounds.x[1] - bounds.x[0] + 2,
+			'height': 2,
+			'depth': 2
+		}),
+		new Obj.Wall({
+			'y': bounds.y[0],
+			'width': bounds.x[1] - bounds.x[0] + 2,
+			'height': 2,
+			'depth': 2
+		}),
+		new Obj.Wall({
+			'x': bounds.x[0],
+			'width': 2,
+			'height': bounds.y[1] - bounds.y[0] + 2,
+			'depth': 2
+		}),
+		new Obj.Wall({
+			'x': bounds.x[1],
+			'width': 2,
+			'height': bounds.y[1] - bounds.y[0] + 2,
+			'depth': 2
+		})
+	];
 
-	walls[0] = new Obj.Wall({
-		'y': bounds.y[1],
-		'width': bounds.x[1] - bounds.x[0] + 2,
-		'height': 2,
-		'depth': 2
-	});
-
-	walls[0].render();
-
-	walls[1] = new Obj.Wall({
-		'y': bounds.y[0],
-		'width': bounds.x[1] - bounds.x[0] + 2,
-		'height': 2,
-		'depth': 2
-	});
-
-	walls[1].render();
-
-	walls[2] = new Obj.Wall({
-		'x': bounds.x[0],
-		'width': 2,
-		'height': bounds.y[1] - bounds.y[0] + 2,
-		'depth': 2
-	});
-
-	walls[2].render();
-
-	walls[3] = new Obj.Wall({
-		'x': bounds.x[1],
-		'width': 2,
-		'height': bounds.y[1] - bounds.y[0] + 2,
-		'depth': 2
-	});
-
-	walls[3].render();
+	for (var i = 0; i < walls.length; ++i) {
+		walls[i].render();
+	}
 
 	// bricks
 
