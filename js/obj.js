@@ -34,14 +34,17 @@ Obj.__init__ = function(cb) {
 			var pos = this.mesh.position;
 
 			if (x) {
+				this.x += x;
 				pos.x += x;
 			}
 
 			if (y) {
+				this.y += y;
 				pos.y += y;
 			}
 
 			if (z) {
+				this.z += z;
 				pos.z += z;
 			}
 		}; // move
