@@ -15,6 +15,8 @@ Player.__init__ = function(cb) {
 		var Ctrl = game.Ctrl;
 		var Renderer = game.Renderer;
 
+		var bounds = game.bounds;
+
 		var parent = Obj.Cube;
 
 		Player = Obj.Player = function(opts) {
@@ -35,11 +37,11 @@ Player.__init__ = function(cb) {
 			//this.move(game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true));
 			//this.move(0.1, 0, 0);
 			//game.log(Ctrl.down);
-			if (Ctrl.down['a']) {
+			if (Ctrl.down['a'] && this.x - (this.width / 2) - 2 > bounds.x[0]) {
 				this.move(-this.speed * elapsed, 0, 0);
 			}
 
-			if (Ctrl.down['d']) {
+			if (Ctrl.down['d'] && this.x + (this.width / 2) + 2 < bounds.x[1]) {
 				this.move(this.speed * elapsed, 0, 0);
 			}
 		}; // update
