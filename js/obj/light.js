@@ -54,10 +54,7 @@ Light.__init__ = function(cb) {
 		}
 
 	}); // load
+
 }; // __init__
-
-game.load('Obj', function() {
-
-}); // load
 
 })(window.game);

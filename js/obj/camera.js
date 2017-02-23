@@ -46,6 +46,7 @@ Camera.__init__ = function(cb) {
 			//this.move(0.1, 0, 0);
 			//this.move(0, 0.1, 0);
 			//this.move(0, 0, 0.1);
+			//this.move(0, 0, -0.1);
 		}; // update
 
 		if (cb) {

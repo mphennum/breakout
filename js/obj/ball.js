@@ -39,6 +39,7 @@ Ball.__init__ = function(cb) {
 		}
 
 	}); // load
+
 }; // __init__
 
 })(window.game);
