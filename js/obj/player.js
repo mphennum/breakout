@@ -20,7 +20,7 @@ Player.__init__ = function(cb) {
 		Player = Obj.Player = function(opts) {
 			opts = opts || {};
 
-			opts.width = opts.width || 20;
+			opts.width = opts.width || 30;
 			opts.height = opts.height || 2;
 			opts.depth = opts.depth || 2;
 
