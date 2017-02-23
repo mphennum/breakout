@@ -8,10 +8,12 @@ var Player = Obj.Player = {};
 Player.__init__ = function(cb) {
 	delete Player.__init__;
 
-	game.load(['Renderer', 'Obj', 'Obj.Cube'], function() {
+	game.load(['Ctrl', 'Renderer', 'Obj', 'Obj.Cube'], function() {
 
-		var Renderer = game.Renderer;
 		Obj = game.Obj;
+
+		var Ctrl = game.Ctrl;
+		var Renderer = game.Renderer;
 
 		var parent = Obj.Cube;
 
@@ -23,6 +25,8 @@ Player.__init__ = function(cb) {
 			opts.depth = opts.depth || 2;
 
 			parent.call(this, opts);
+
+			this.speed = opts.speed || 0.2;
 		}; // constructor
 
 		Player.prototype = Object.create(parent.prototype);
@@ -30,6 +34,14 @@ Player.__init__ = function(cb) {
 		Player.prototype.update = function(elapsed) {
 			//this.move(game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true));
 			//this.move(0.1, 0, 0);
+			//game.log(Ctrl.down);
+			if (Ctrl.down['a']) {
+				this.move(-this.speed * elapsed, 0, 0);
+			}
+
+			if (Ctrl.down['d']) {
+				this.move(this.speed * elapsed, 0, 0);
+			}
 		}; // update
 
 		if (cb) {
@@ -37,6 +49,7 @@ Player.__init__ = function(cb) {
 		}
 
 	}); // load
+
 }; // __init__
 
 })(window.game);
