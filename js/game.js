@@ -23,6 +23,7 @@ var game = window.game = {
 };
 
 var Obj;
+var Ctrl;
 var Renderer;
 var objmap = game.objmap;
 var $head = game.elemap.$head;
@@ -40,6 +41,7 @@ game.start = function() {
 	}; // onresize
 
 	Obj = game.Obj;
+	Ctrl = game.Ctrl;
 
 	Renderer = game.Renderer;
 	Renderer.init();
@@ -127,6 +129,7 @@ game.start = function() {
 			objmap[k].update(elapsed);
 		}
 
+		Ctrl.update();
 		Renderer.render();
 
 		prev = ms;
@@ -467,7 +470,7 @@ game.log = function() {
 
 // init
 game.load('Ext.THREE', function() {
-	game.load(['Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick', 'Obj.Ball'/*, 'Obj.Background'*/], game.start);
+	game.load(['Ctrl', 'Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick', 'Obj.Ball'/*, 'Obj.Background'*/], game.start);
 }); // load
 
 })(window.JSON);
