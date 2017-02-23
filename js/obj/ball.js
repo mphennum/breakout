@@ -18,7 +18,7 @@ Ball.__init__ = function(cb) {
 		Ball = Obj.Ball = function(opts) {
 			opts = opts || {};
 
-			opts.radius = opts.radius || 5;
+			opts.radius = opts.radius || 4;
 
 			parent.call(this, opts);
 
