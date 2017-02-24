@@ -89,12 +89,10 @@ Renderer.__init__ = function(cb) {
 				opts.far || Renderer.DEFAULT_FAR
 			);
 
-			if (!opts.width && !opts.height) {
-				game.onresize(function(width, height) {
-					camera.aspect = width / height;
-					camera.updateProjectionMatrix();
-				}); // onresize
-			}
+			game.onresize(function(width, height) {
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+			}); // onresize
 
 			return camera;
 		}; // renderCamera
@@ -153,6 +151,21 @@ Renderer.__init__ = function(cb) {
 
 			return sphere;
 		}; // createSphere
+
+		Renderer.computeBoundingBox = function(obj) {
+			var geom = obj.mesh.geometry;
+			geom.computeBoundingBox();
+			var box = new THREE.Box3(
+				geom.boundingBox.min,
+				geom.boundingBox.max
+			);
+
+			return box;
+
+			/*var box = new THREE.BoxHelper(new THREE.Vector3(), new THREE.Vector3());
+			box.setFromObject(obj.mesh);
+			return box;*/
+		}; // computeBoundingBox
 
 		if (cb) {
 			cb();
