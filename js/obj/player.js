@@ -46,6 +46,10 @@ Player.__init__ = function(cb) {
 			}
 		}; // update
 
+		Player.prototype.handleCollision = function(obj) {
+
+		}; // handleCollision
+
 		if (cb) {
 			cb();
 		}

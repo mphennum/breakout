@@ -35,6 +35,10 @@ Brick.__init__ = function(cb) {
 			//this.move(0.1, 0, 0);
 		}; // update
 
+		Brick.prototype.handleCollision = function(obj) {
+
+		}; // handleCollision
+
 		if (cb) {
 			cb();
 		}
