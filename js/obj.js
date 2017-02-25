@@ -16,9 +16,9 @@ Obj.__init__ = function(cb) {
 
 			this.collidable = !!opts.collidable;
 
-			this.x = opts.x || Renderer.DEFAULT_X;
-			this.y = opts.y || Renderer.DEFAULT_Y;
-			this.z = opts.z || Renderer.DEFAULT_Z;
+			this.lastx = this.x = opts.x || Renderer.DEFAULT_X;
+			this.lasty = this.y = opts.y || Renderer.DEFAULT_Y;
+			this.lastz = this.z = opts.z || Renderer.DEFAULT_Z;
 
 			this.mesh = null;
 			this.boundingbox = null;
@@ -44,20 +44,31 @@ Obj.__init__ = function(cb) {
 			this.move(this.x, this.y, this.z);
 		}; // render
 
+		Obj.prototype.remove = function() {
+			game.remove(this);
+		}; // remove
+
+		Obj.prototype.moveToLast = function() {
+			this.move(this.lastx - this.x, this.lasty - this.y, this.lastz - this.z);
+		}; // moveToLast
+
 		Obj.prototype.move = function(x, y, z) {
 			var mesh = this.mesh;
 
 			if (x) {
+				this.lastx = this.x;
 				this.x += x;
 				mesh.translateX(x);
 			}
 
 			if (y) {
+				this.lasty = this.y;
 				this.y += y;
 				mesh.translateY(y);
 			}
 
 			if (z) {
+				this.lastz = this.z;
 				this.z += z;
 				mesh.translateZ(z);
 			}
