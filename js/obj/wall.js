@@ -31,7 +31,9 @@ Wall.__init__ = function(cb) {
 		}; // update
 
 		Wall.prototype.handleCollision = function(obj) {
-
+			if (obj instanceof Obj.Ball) {
+				obj.handleCollision(this);
+			}
 		}; // handleCollision
 
 		if (cb) {
