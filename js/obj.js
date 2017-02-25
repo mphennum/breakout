@@ -63,7 +63,7 @@ Obj.__init__ = function(cb) {
 			}
 
 			if (this.collidable) {
-				//this.boundingbox.translate(new THREE.Vector3(x || 0, y || 0, z || 0));
+				this.boundingbox.translate(new THREE.Vector3(x || 0, y || 0, z || 0));
 			}
 		}; // move
 
