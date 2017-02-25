@@ -29,72 +29,56 @@ Ball.__init__ = function(cb) {
 		Ball.prototype = Object.create(parent.prototype);
 
 		Ball.prototype.setSpeed = function(speed) {
-			this.speed = speed;
-			this.speedx = speed * Math.sin(this.dir);
-			this.speedy = speed * Math.cos(this.dir);
+			this.speed = speed || this.speed;
+			this.speedx = this.speed * Math.sin(this.dir);
+			this.speedy = this.speed * Math.cos(this.dir);
 		}; // setSpeed
 
+		Ball.prototype.setSpeedX = function(speedx) {
+			//x = speed * sin(dir) ... y = speed * cos(dir)
+			//x / speed = sin(dir)
+			this.dir = Math.asin(speedx / this.speed);
+			this.setSpeed();
+		}; // setSpeedX
+
+		Ball.prototype.setSpeedY = function(speedy) {
+			this.dir = Math.acos(speedy / this.speed);
+			this.setSpeed();
+		}; // setSpeedY
+
 		Ball.prototype.update = function(elapsed) {
-			//this.move(game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true));
-			//this.move(0.1, 0, 0);
 			this.move(this.speedx, this.speedy, 0);
 		}; // update
-
-		Ball.prototype.reverseSpeedX = function() {
-			this.speedx = -this.speedx;
-			this.dir = Math.asin(this.speedx / this.speed);
-			this.speedy += game.rand(-this.speed * 0.1, this.speed * 0.1, true);
-		}; // reverseSpeedX
-
-		Ball.prototype.reverseSpeedY = function() {
-			this.speedy = -this.speedy;
-			this.dir = Math.asin(this.speedy / this.speed);
-			this.speedx += game.rand(-this.speed * 0.1, this.speed * 0.1, true);
-		}; // reverseSpeedY
 
 		Ball.prototype.handleCollision = function(obj) {
 			if (obj instanceof Obj.Player) {
 				this.moveToLast();
-				//this.speedy = -this.speedy;
-				this.reverseSpeedY();
+				this.setSpeedY(-this.speedy);
+				//#TODO change speed x based on which side of paddle ball was hit
 			} else if (obj instanceof Obj.Wall) {
 				//game.log('wall collision');
 				if (obj.bottom) { // bottom wall
 					this.remove();
 				} else {
 					if (this.y < obj.y - (obj.height / 2)) {// || this.y > obj.y) { // top wall
-						//game.log('from bottom or top');
 						this.moveToLast();
-						//this.speedy = -this.speedy;
-						this.reverseSpeedY();
+						this.setSpeedY(-this.speedy);
 					} else { //if (this.x < obj.x || this.x > obj.x) { // left or right walls
-						//game.log('from left or right');
 						this.moveToLast();
-						//this.speedx = -this.speedx;
-						this.reverseSpeedX();
+						this.setSpeedX(-this.speedx);
 					}
 				}
 			} else if (obj instanceof Obj.Brick) {
 				if (this.y < obj.y - (obj.height / 2) || this.y > obj.y + (obj.height / 2)) { // from bottom or top
-					//game.log('from bottom or top');
 					this.moveToLast();
-					//this.speedy = -this.speedy;
-					this.reverseSpeedY();
+					this.setSpeedY(-this.speedy);
 					obj.remove();
 				} else {// if (this.x < obj.x || this.x > obj.x) { // from left or right
-					//game.log('from left or right');
 					this.moveToLast();
-					//this.speedx = -this.speedx;
-					this.reverseSpeedX();
+					this.setSpeedX(-this.speedx);
 					obj.remove();
 				}
 			}
-			/*game.log('Ball collision');
-			game.log('this.mesh.position', this.mesh.position);
-			game.log('this.boundingbox', this.boundingbox);
-			game.log('obj.mesh.position', obj.mesh.position);
-			game.log('obj.boundingbox', obj.boundingbox);
-			game.log('is player', obj instanceof Obj.Player);*/
 		}; // handleCollision
 
 		if (cb) {
