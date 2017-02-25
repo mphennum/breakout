@@ -22,7 +22,7 @@ Ball.__init__ = function(cb) {
 
 			parent.call(this, opts);
 
-			this.speed = opts.speed || 0.25;
+			this.speed = opts.speed || 1;
 			this.dir = opts.dir || Math.PI * 1.5; // down
 		}; // constructor
 
@@ -33,6 +33,15 @@ Ball.__init__ = function(cb) {
 			//this.move(0.1, 0, 0);
 			this.move(0, -this.speed, 0);
 		}; // update
+
+		Ball.prototype.handleCollision = function(obj) {
+			/*game.log('Ball collision');
+			game.log('this.mesh.position', this.mesh.position);
+			game.log('this.boundingbox', this.boundingbox);
+			game.log('obj.mesh.position', obj.mesh.position);
+			game.log('obj.boundingbox', obj.boundingbox);
+			game.log('is player', obj instanceof Obj.Player);*/
+		}; // handleCollision
 
 		if (cb) {
 			cb();
