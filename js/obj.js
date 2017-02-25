@@ -14,44 +14,58 @@ Obj.__init__ = function(cb) {
 		Obj = game.Obj = function(opts) {
 			opts = opts || {};
 
+			this.collidable = !!opts.collidable;
+
 			this.x = opts.x || Renderer.DEFAULT_X;
 			this.y = opts.y || Renderer.DEFAULT_Y;
 			this.z = opts.z || Renderer.DEFAULT_Z;
 
 			this.mesh = null;
+			this.boundingbox = null;
 		}; // constructor
 
-		//Obj.prototype.resize = function(w, h) {}; // resize
+		/*Object.prototype.update = function(elapsed) {
+
+		};*/ // update
+
+		Obj.prototype.intersects = function(obj) {
+			return this.boundingbox.intersectsBox(obj.boundingbox);
+		}; // intersects
 
 		Obj.prototype.render = function(mesh) {
 			this.mesh = mesh || null;
+
+			if (mesh && this.collidable) {
+				this.boundingbox = Renderer.computeBoundingBox(this);
+			}
+
 			game.add(this);
 
 			this.move(this.x, this.y, this.z);
 		}; // render
 
 		Obj.prototype.move = function(x, y, z) {
-			var pos = this.mesh.position;
+			var mesh = this.mesh;
 
 			if (x) {
 				this.x += x;
-				pos.x += x;
+				mesh.translateX(x);
 			}
 
 			if (y) {
 				this.y += y;
-				pos.y += y;
+				mesh.translateY(y);
 			}
 
 			if (z) {
 				this.z += z;
-				pos.z += z;
+				mesh.translateZ(z);
+			}
+
+			if (this.collidable) {
+				//this.boundingbox.translate(new THREE.Vector3(x || 0, y || 0, z || 0));
 			}
 		}; // move
-
-		Obj.prototype.intersects = function(obj) {
-			return false;
-		}; // intersects
 
 		if (cb) {
 			cb();
