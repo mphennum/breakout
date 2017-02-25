@@ -16,6 +16,8 @@ Sphere.__init__ = function(cb) {
 		Sphere = Obj.Sphere = function(opts) {
 			opts = opts || {};
 
+			opts.collidable = (opts.collidable !== false);
+
 			parent.call(this, opts);
 
 			this.color = opts.color || Renderer.DEFAULT_COLOR;

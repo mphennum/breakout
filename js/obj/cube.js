@@ -16,6 +16,8 @@ Cube.__init__ = function(cb) {
 		Cube = Obj.Cube = function(opts) {
 			opts = opts || {};
 
+			opts.collidable = (opts.collidable !== false);
+
 			parent.call(this, opts);
 
 			this.color = opts.color || Renderer.DEFAULT_COLOR;
