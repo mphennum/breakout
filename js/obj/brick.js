@@ -36,7 +36,9 @@ Brick.__init__ = function(cb) {
 		}; // update
 
 		Brick.prototype.handleCollision = function(obj) {
-
+			if (obj instanceof Obj.Ball) {
+				obj.handleCollision(this);
+			}
 		}; // handleCollision
 
 		if (cb) {
