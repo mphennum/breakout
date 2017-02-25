@@ -14,7 +14,8 @@ var game = window.game = {
 		'$head': document.getElementsByTagName('head')[0],
 		'$body': document.getElementsByTagName('body')[0]
 	},
-	'objmap': {},
+	'objmap': {}, // objs that must be rendered / updated
+	'collidemap': {}, // objs that can collide with eachother
 	'bounds': {
 		'x': [-160, 160],
 		'y': [-100, 100],
@@ -26,8 +27,17 @@ var Obj;
 var Ctrl;
 var Renderer;
 var objmap = game.objmap;
+var collidemap = game.collidemap;
 var $head = game.elemap.$head;
 var bounds = game.bounds;
+
+game.test = function() {
+	/*game.log('Ball collision');
+	game.log('ball.mesh.position', game.ball.mesh.position);
+	game.log('ball.boundingbox.min', game.ball.boundingbox.min);
+	game.log('player.mesh.position', game.player.mesh.position);
+	game.log('player.boundingbox.min', game.player.boundingbox.min);*/
+}; // test
 
 game.start = function() {
 	var timer;
@@ -52,10 +62,10 @@ game.start = function() {
 	var light = new Obj.Light();
 	light.render();
 
-	var player = new Obj.Player({'y': bounds.y[0] + 4});
+	var player = game.player = new Obj.Player({'y': bounds.y[0] + 4});
 	player.render();
 
-	var ball = new Obj.Ball();
+	var ball = game.ball = new Obj.Ball();
 	ball.render();
 
 	// walls
@@ -129,6 +139,23 @@ game.start = function() {
 			objmap[k].update(elapsed);
 		}
 
+		var skip = 1;
+		for (var k in collidemap) {
+			var pos = 0;
+			for (var j in collidemap) {
+				if (pos++ < skip) {
+					continue;
+				}
+
+				if (collidemap[k].intersects(collidemap[j])) {
+					collidemap[k].handleCollision(collidemap[j]);
+					collidemap[j].handleCollision(collidemap[k]);
+				}
+			}
+
+			++skip;
+		}
+
 		Ctrl.update();
 		Renderer.render();
 
@@ -194,12 +221,20 @@ game.add = function(obj) {
 		objmap[obj.mesh.id] = obj;
 	}
 
+	if (obj.collidable) {
+		collidemap[obj.mesh.id] = obj;
+	}
+
 	Renderer.add(obj.mesh);
 }; // add
 
 game.remove = function(obj) {
 	if (obj.update) {
 		delete objmap[obj.mesh.id];
+	}
+
+	if (obj.collidable) {
+		delete collidemap[obj.mesh.id];
 	}
 
 	Renderer.remove(obj.mesh);
