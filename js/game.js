@@ -149,12 +149,13 @@ game.start = function() {
 
 				if (collidemap[k].intersects(collidemap[j])) {
 					collidemap[k].handleCollision(collidemap[j]);
-					collidemap[j].handleCollision(collidemap[k]);
 				}
 			}
 
 			++skip;
 		}
+
+		game.clean();
 
 		Ctrl.update();
 		Renderer.render();
@@ -228,17 +229,27 @@ game.add = function(obj) {
 	Renderer.add(obj.mesh);
 }; // add
 
+var removes = [];
 game.remove = function(obj) {
-	if (obj.update) {
-		delete objmap[obj.mesh.id];
-	}
-
-	if (obj.collidable) {
-		delete collidemap[obj.mesh.id];
-	}
-
-	Renderer.remove(obj.mesh);
+	removes[removes.length] = obj;
 }; // remove
+
+game.clean = function() {
+	for (var i = 0; i < removes.length; ++i) {
+		var obj = removes[i];
+		if (obj.update) {
+			delete objmap[obj.mesh.id];
+		}
+
+		if (obj.collidable) {
+			delete collidemap[obj.mesh.id];
+		}
+
+		Renderer.remove(obj.mesh);
+	}
+
+	removes = [];
+}; // clean
 
 // load
 
