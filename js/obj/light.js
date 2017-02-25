@@ -16,8 +16,8 @@ Light.__init__ = function(cb) {
 		Light = Obj.Light = function(opts) {
 			opts = opts || {};
 
-			opts.x = opts.x || Renderer.DEFAULT_X;
-			opts.x = opts.x || Renderer.DEFAULT_Y;
+			//opts.x = opts.x || Renderer.DEFAULT_X;
+			//opts.x = opts.x || Renderer.DEFAULT_Y;
 			opts.z = opts.z || 3;
 
 			parent.call(this, opts);
