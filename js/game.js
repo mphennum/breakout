@@ -5,6 +5,7 @@
 var game = window.game = {
 	'dev': true,
 	'over': false,
+	'paused': false,
 	'modulemap': {}, // 'Renderer': 'game', ...
 	'manifestmap': {}, // 'game': ['Renderer', ...]
 	'urlmap': {
@@ -135,30 +136,37 @@ game.start = function() {
 	var loop = function(ms) {
 		elapsed = ms - prev;
 
-		for (var k in objmap) {
-			objmap[k].update(elapsed);
+		if (Ctrl.pressed['space']) {
+			game.paused = !game.paused;
 		}
 
-		var skip = 1;
-		for (var k in collidemap) {
-			var pos = 0;
-			for (var j in collidemap) {
-				if (pos++ < skip) {
-					continue;
-				}
-
-				if (collidemap[k].intersects(collidemap[j])) {
-					collidemap[k].handleCollision(collidemap[j]);
-				}
+		if (!game.paused) {
+			for (var k in objmap) {
+				objmap[k].update(elapsed);
 			}
 
-			++skip;
+			var skip = 1;
+			for (var k in collidemap) {
+				var pos = 0;
+				for (var j in collidemap) {
+					if (pos++ < skip) {
+						continue;
+					}
+
+					if (collidemap[k].intersects(collidemap[j])) {
+						collidemap[k].handleCollision(collidemap[j]);
+					}
+				}
+
+				++skip;
+			}
+
+			game.clean();
+
+			Renderer.render();
 		}
 
-		game.clean();
-
 		Ctrl.update();
-		Renderer.render();
 
 		prev = ms;
 		requestAnimationFrame(loop);
