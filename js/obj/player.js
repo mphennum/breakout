@@ -28,7 +28,7 @@ Player.__init__ = function(cb) {
 
 			parent.call(this, opts);
 
-			this.speed = opts.speed || 0.2;
+			this.speed = opts.speed || 0.15;
 		}; // constructor
 
 		Player.prototype = Object.create(parent.prototype);
