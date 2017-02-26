@@ -48,10 +48,6 @@ Obj.__init__ = function(cb) {
 			game.remove(this);
 		}; // remove
 
-		Obj.prototype.moveToLast = function() {
-			this.move(this.lastx - this.x, this.lasty - this.y, this.lastz - this.z);
-		}; // moveToLast
-
 		Obj.prototype.move = function(x, y, z) {
 			var mesh = this.mesh;
 
@@ -77,6 +73,10 @@ Obj.__init__ = function(cb) {
 				this.boundingbox.translate(new THREE.Vector3(x || 0, y || 0, z || 0));
 			}
 		}; // move
+
+		Obj.prototype.moveToLast = function() {
+			this.move(this.lastx - this.x, this.lasty - this.y, this.lastz - this.z);
+		}; // moveToLast
 
 		if (cb) {
 			cb();
