@@ -25,13 +25,15 @@ Wall.__init__ = function(cb) {
 
 		Wall.prototype = Object.create(parent.prototype);
 
+		Wall.prototype.iswall = true;
+
 		Wall.prototype.update = function(elapsed) {
 			//this.move(game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true));
 			//this.move(0.1, 0, 0);
 		}; // update
 
 		Wall.prototype.handleCollision = function(obj) {
-			if (obj instanceof Obj.Ball) {
+			if (obj.isball) {
 				obj.handleCollision(this);
 			}
 		}; // handleCollision

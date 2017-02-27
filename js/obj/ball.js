@@ -31,6 +31,8 @@ Ball.__init__ = function(cb) {
 
 		Ball.prototype = Object.create(parent.prototype);
 
+		Ball.prototype.isball = true;
+
 		Ball.prototype.setDir = function(dir) {
 			if (dir > TAU) {
 				dir -= TAU;
@@ -76,11 +78,11 @@ Ball.__init__ = function(cb) {
 		}; // update
 
 		Ball.prototype.handleCollision = function(obj) {
-			if (obj instanceof Obj.Player) {
+			if (obj.isplayer) {
 				this.moveToLast();
 				this.setSpeedY(-this.speedy);
 				this.setSpeedX(.95 * ((this.x - obj.x) / obj.width) * this.speed);
-			} else if (obj instanceof Obj.Wall) {
+			} else if (obj.iswall) {
 				if (obj.bottom) { // bottom wall
 					this.remove();
 				} else if (this.y < obj.y - (obj.height / 2)) {// || this.y > obj.y) { // top wall
@@ -90,7 +92,7 @@ Ball.__init__ = function(cb) {
 					this.moveToLast();
 					this.setSpeedX(-this.speedx);
 				}
-			} else if (obj instanceof Obj.Brick) {
+			} else if (obj.isbrick) {
 				if (this.y < obj.y - (obj.height / 2) || this.y > obj.y + (obj.height / 2)) { // from bottom or top
 					this.moveToLast();
 					this.setSpeedY(-this.speedy);

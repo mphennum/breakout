@@ -33,6 +33,8 @@ Player.__init__ = function(cb) {
 
 		Player.prototype = Object.create(parent.prototype);
 
+		Player.prototype.isplayer = true;
+
 		Player.prototype.update = function(elapsed) {
 			//this.move(game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true), game.rand(-0.01, 0.01, true));
 			//this.move(0.1, 0, 0);
@@ -47,7 +49,7 @@ Player.__init__ = function(cb) {
 		}; // update
 
 		Player.prototype.handleCollision = function(obj) {
-			if (obj instanceof Obj.Ball) {
+			if (obj.isball) {
 				obj.handleCollision(this);
 			}
 		}; // handleCollision

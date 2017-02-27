@@ -28,6 +28,8 @@ Obj.__init__ = function(cb) {
 
 		};*/ // update
 
+		Obj.prototype.isobj = true;
+
 		Obj.prototype.intersects = function(obj) {
 			return this.boundingbox.intersectsBox(obj.boundingbox);
 		}; // intersects

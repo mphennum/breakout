@@ -28,6 +28,8 @@ Sphere.__init__ = function(cb) {
 
 		Sphere.prototype = Object.create(parent.prototype);
 
+		Sphere.prototype.issphere = true;
+
 		Sphere.prototype.render = function() {
 			parent.prototype.render.call(this, Renderer.createSphere({
 				'color': this.color,

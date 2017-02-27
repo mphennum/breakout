@@ -31,6 +31,8 @@ Cube.__init__ = function(cb) {
 
 		Cube.prototype = Object.create(parent.prototype);
 
+		Cube.prototype.iscube = true;
+
 		Cube.prototype.render = function() {
 			parent.prototype.render.call(this, Renderer.createCube({
 				'color': this.color,
