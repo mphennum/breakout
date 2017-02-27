@@ -6,6 +6,8 @@ var game = window.game = {
 	'dev': true,
 	'over': false,
 	'paused': false,
+	'bricks': 0,
+	'score': 0,
 	'modulemap': {}, // 'Renderer': 'game', ...
 	'manifestmap': {}, // 'game': ['Renderer', ...]
 	'urlmap': {
@@ -83,7 +85,7 @@ game.start = function() {
 			'width': bounds.x[1] - bounds.x[0] + 2,
 			'height': 2,
 			'depth': 2,
-			'bottom': true
+			'isbottom': true
 		}),
 		new Obj.Wall({
 			'x': bounds.x[0],
@@ -523,7 +525,7 @@ game.log = function() {
 
 // init
 game.load('Ext.THREE', function() {
-	game.load(['Ctrl', 'Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick', 'Obj.Ball'], game.start);
+	game.load(['Ctrl', 'Renderer', 'HUD', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick', 'Obj.Ball'], game.start);
 }); // load
 
 })(window.JSON);
