@@ -83,7 +83,7 @@ Ball.__init__ = function(cb) {
 				this.setSpeedY(-this.speedy);
 				this.setSpeedX(.95 * ((this.x - obj.x) / obj.width) * this.speed);
 			} else if (obj.iswall) {
-				if (obj.bottom) { // bottom wall
+				if (obj.isbottom) { // bottom wall
 					this.remove();
 				} else if (this.y < obj.y - (obj.height / 2)) {// || this.y > obj.y) { // top wall
 					this.moveToLast();

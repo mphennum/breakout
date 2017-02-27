@@ -20,7 +20,7 @@ Wall.__init__ = function(cb) {
 
 			parent.call(this, opts);
 
-			this.bottom = !!opts.bottom;
+			this.isbottom = !!opts.isbottom;
 		}; // constructor
 
 		Wall.prototype = Object.create(parent.prototype);
