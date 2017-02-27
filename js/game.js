@@ -162,10 +162,9 @@ game.start = function() {
 			}
 
 			game.clean();
-
-			Renderer.render();
 		}
 
+		Renderer.render();
 		Ctrl.update();
 
 		prev = ms;
