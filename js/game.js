@@ -523,7 +523,7 @@ game.log = function() {
 
 // init
 game.load('Ext.THREE', function() {
-	game.load(['Ctrl', 'Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick', 'Obj.Ball'/*, 'Obj.Background'*/], game.start);
+	game.load(['Ctrl', 'Renderer', 'Obj.Camera', 'Obj.Light', 'Obj.Player', 'Obj.Wall', 'Obj.Brick', 'Obj.Ball'], game.start);
 }); // load
 
 })(window.JSON);
