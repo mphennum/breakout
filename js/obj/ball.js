@@ -15,6 +15,9 @@ Ball.__init__ = function(cb) {
 
 		var parent = Obj.Sphere;
 
+		var PI = Math.PI;
+		var TAU = PI * 2;
+
 		Ball = Obj.Ball = function(opts) {
 			opts = opts || {};
 
@@ -22,11 +25,23 @@ Ball.__init__ = function(cb) {
 
 			parent.call(this, opts);
 
-			this.dir = opts.dir || Math.PI; // down
+			this.dir = opts.dir || PI; // 0 is up, PI is down
 			this.setSpeed(opts.speed || 2);
 		}; // constructor
 
 		Ball.prototype = Object.create(parent.prototype);
+
+		Ball.prototype.setDir = function(dir) {
+			if (dir > TAU) {
+				dir -= TAU;
+			} else if (dir < TAU) {
+				dir += TAU;
+			}
+
+			this.dir = dir;
+			this.speedx = this.speed * Math.sin(dir);
+			this.speedy = this.speed * Math.cos(dir);
+		}; // setDir
 
 		Ball.prototype.setSpeed = function(speed) {
 			this.speed = speed || this.speed;
@@ -34,16 +49,26 @@ Ball.__init__ = function(cb) {
 			this.speedy = this.speed * Math.cos(this.dir);
 		}; // setSpeed
 
+		// never set abs(speedx) > speed
 		Ball.prototype.setSpeedX = function(speedx) {
-			//x = speed * sin(dir) ... y = speed * cos(dir)
-			//x / speed = sin(dir)
 			this.dir = Math.asin(speedx / this.speed);
-			this.setSpeed();
+			if (this.speedy < 0) {
+				this.dir += PI;
+			}
+
+			this.speedx = speedx;
+			this.speedy = this.speed * Math.cos(this.dir);
 		}; // setSpeedX
 
+		// never set abs(speedy) > speed
 		Ball.prototype.setSpeedY = function(speedy) {
 			this.dir = Math.acos(speedy / this.speed);
-			this.setSpeed();
+			if (this.speedx < 0) {
+				this.dir += PI;
+			}
+
+			this.speedy = speedy;
+			this.speedx = this.speed * Math.sin(this.dir);
 		}; // setSpeedY
 
 		Ball.prototype.update = function(elapsed) {
@@ -54,30 +79,27 @@ Ball.__init__ = function(cb) {
 			if (obj instanceof Obj.Player) {
 				this.moveToLast();
 				this.setSpeedY(-this.speedy);
-				//#TODO change speed x based on which side of paddle ball was hit
+				this.setSpeedX(.95 * ((this.x - obj.x) / obj.width) * this.speed);
 			} else if (obj instanceof Obj.Wall) {
-				//game.log('wall collision');
 				if (obj.bottom) { // bottom wall
 					this.remove();
-				} else {
-					if (this.y < obj.y - (obj.height / 2)) {// || this.y > obj.y) { // top wall
-						this.moveToLast();
-						this.setSpeedY(-this.speedy);
-					} else { //if (this.x < obj.x || this.x > obj.x) { // left or right walls
-						this.moveToLast();
-						this.setSpeedX(-this.speedx);
-					}
+				} else if (this.y < obj.y - (obj.height / 2)) {// || this.y > obj.y) { // top wall
+					this.moveToLast();
+					this.setSpeedY(-this.speedy);
+				} else { //if (this.x < obj.x || this.x > obj.x) { // left or right walls
+					this.moveToLast();
+					this.setSpeedX(-this.speedx);
 				}
 			} else if (obj instanceof Obj.Brick) {
 				if (this.y < obj.y - (obj.height / 2) || this.y > obj.y + (obj.height / 2)) { // from bottom or top
 					this.moveToLast();
 					this.setSpeedY(-this.speedy);
-					obj.remove();
 				} else {// if (this.x < obj.x || this.x > obj.x) { // from left or right
 					this.moveToLast();
 					this.setSpeedX(-this.speedx);
-					obj.remove();
 				}
+
+				obj.remove();
 			}
 		}; // handleCollision
 
