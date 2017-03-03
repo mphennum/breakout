@@ -11,6 +11,8 @@ Renderer.__init__ = function(cb) {
 
 		var THREE = window.THREE;
 
+		var canvas;
+
 		var scene;
 		var renderer;
 		var camera;
@@ -41,9 +43,12 @@ Renderer.__init__ = function(cb) {
 
 			scene = new THREE.Scene();
 
-			renderer = new THREE.WebGLRenderer({'antialias': true});
+			var $parent = opts.parent || game.elemap.$body;
+			canvas = document.createElement('canvas');
+			$parent.appendChild(canvas);
+
+			renderer = new THREE.WebGLRenderer({'antialias': true, 'canvas': canvas});
 			renderer.setSize(opts.width || window.innerWidth, opts.height || window.innerHeight);
-			game.elemap.$body.appendChild(renderer.domElement);
 
 			// shadows
 
