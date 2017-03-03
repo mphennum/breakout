@@ -2,36 +2,66 @@
 
 'use strict';
 
-var game = window.game = {
-	'dev': true,
-	'over': false,
-	'paused': false,
-	'bricks': 0,
-	'score': 0,
-	'modulemap': {}, // 'Renderer': 'game', ...
-	'manifestmap': {}, // 'game': ['Renderer', ...]
-	'urlmap': {
-		'base': 'http://www.mphennum.com/work/breakout/'
-	},
-	'elemap': {
-		'$head': document.getElementsByTagName('head')[0],
-		'$body': document.getElementsByTagName('body')[0]
-	},
-	'objmap': {}, // objs that must be rendered / updated
-	'collidemap': {}, // objs that can collide with eachother
-	'bounds': {
-		'x': [-160, 160],
-		'y': [-100, 100],
-		'z': [-1, 1]
+var game = window.game = {};
+
+var baseurl;
+var opts = {};
+var script = null;
+var scripts = document.getElementsByTagName('script');
+for (var i = 0; i < scripts.length; ++i) {
+	var src = scripts[i].src;
+	if (src.substr(-7) === 'game.js') {
+		script = scripts[i];
+
+		try {
+			baseurl = src.substr(0, src.length - 10);
+			opts = JSON.parse(script.innerHTML);
+		} catch (e) {
+			console.error('unable to parse game options');
+		}
+
+		break;
 	}
+}
+
+var $head = document.getElementsByTagName('head')[0];
+var $body = document.getElementsByTagName('body')[0];
+var $parent = opts.parent && document.querySelector(opts.parent) || $body;
+
+game.dev = true;
+game.over = false;
+game.paused = false;
+game.bricks = 0;
+game.score = 0;
+game.modulemap = {}; // 'Renderer': 'game', ...
+game.manifestmap = {}; // 'game': ['Renderer', ...]
+
+baseurl = baseurl || 'http://www.mphennum.com/work/breakout/';
+game.urlmap = {
+	'base': baseurl
+};
+
+game.elemap = {
+	'$head': $head,
+	'$body': $body,
+	'$parent': $parent
+};
+
+game.objmap = {}; // objs that must be rendered / updated
+game.collidemap = {}; // objs that can collide with eachother
+
+game.bounds = {
+	'x': [-160, 160],
+	'y': [-100, 100],
+	'z': [-1, 1]
 };
 
 var Obj;
 var Ctrl;
+var HUD;
 var Renderer;
 var objmap = game.objmap;
 var collidemap = game.collidemap;
-var $head = game.elemap.$head;
 var bounds = game.bounds;
 
 game.test = function() {
@@ -57,7 +87,10 @@ game.start = function() {
 	Ctrl = game.Ctrl;
 
 	Renderer = game.Renderer;
-	Renderer.init();
+	Renderer.init({'parent': $parent});
+
+	HUD = game.HUD;
+	HUD.init({'parent': $parent});
 
 	var camera = new Obj.Camera();
 	camera.render();
@@ -108,7 +141,7 @@ game.start = function() {
 	// bricks
 
 	var Brick = Obj.Brick;
-	var bricky = bounds.y[1] - Brick.DEFAULT_HEIGHT * 10;
+	var bricky = bounds.y[1] - Brick.DEFAULT_HEIGHT * 20;
 	var brickcols = Math.floor((bounds.x[1] - bounds.x[0] - Brick.DEFAULT_WIDTH) / (Brick.DEFAULT_WIDTH + 0.5));
 	var brickrowcolors = [0xAA33AA, 0xAA2233, 0xAAAA33, 0x22AA33, 0x33AAAA, 0x2233AA];
 
@@ -167,7 +200,8 @@ game.start = function() {
 		}
 
 		Renderer.render();
-		Ctrl.update();
+		HUD.update(elapsed);
+		Ctrl.update(elapsed);
 
 		prev = ms;
 		requestAnimationFrame(loop);
@@ -272,12 +306,12 @@ var manifestmap = game.manifestmap;
 var loadImage = function(file, cb) {
 	var img = document.createElement('img');
 	img.addEventListener('load', cb);
-	img.src = 'img/' + file.replace(/\./g, '/').toLowerCase() + '.png';
+	img.src = baseurl + 'img/' + file.replace(/\./g, '/').toLowerCase() + '.png';
 }; // loadImage
 
 var loadJSON = function(module, cb) {
 	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'json/' + module.replace(/\./g, '/').toLowerCase() + '.json', true);
+	xhr.open('GET', baseurl + 'json/' + module.replace(/\./g, '/').toLowerCase() + '.json', true);
 
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState === 4) {
@@ -426,7 +460,7 @@ var loadJSModule = function(module, cb) {
 		loadingmap[module] = [cb];
 	}
 
-	loadJS('js/' + pkg.replace(/\./g, '/').toLowerCase() + '.js', function() {
+	loadJS(baseurl + 'js/' + pkg.replace(/\./g, '/').toLowerCase() + '.js', function() {
 		if (modules) {
 			for (var i = 0; i < modules.length; ++i) {
 				var mod = modules[i];
@@ -467,7 +501,7 @@ var loadJSExt = function(ext, cb) {
 
 	loadingmap[ext] = cb ? [cb] : [];
 
-	loadJS('js/' + ext.replace(/\./g, '/').toLowerCase() + '.js', function() {
+	loadJS(baseurl + 'js/' + ext.replace(/\./g, '/').toLowerCase() + '.js', function() {
 		loadedmap[ext] = true;
 		for (var i = 0, cbs = loadingmap[ext]; i < cbs.length; ++i) {
 			cbs[i]();
