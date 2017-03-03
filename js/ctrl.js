@@ -100,7 +100,7 @@ Ctrl.__init__ = function(cb) {
 			keydownhandlers[handlers.length] = cb;
 		};*/ // onkeydown
 
-		Ctrl.update = function() {
+		Ctrl.update = function(elapsed) {
 			for (var k in pressed) {
 				delete pressed[k];
 			}
