@@ -11,7 +11,6 @@ Ctrl.__init__ = function(cb) {
 
 		var down = Ctrl.down = {}; // key is down until keyup event occurs
 		var pressed = Ctrl.pressed = {}; // key is pressed until next update
-		//var keydownhandlers = {};
 
 		var keymap = Ctrl.keymap = {
 			'q': 81,
@@ -77,12 +76,7 @@ Ctrl.__init__ = function(cb) {
 			pressed[key] = true;
 			down[key] = true;
 
-			/*var handlers = keydownhandlers[key];
-			if (handlers) {
-				for (var i = 0; i < handlers; ++i) {
-					handlers[i]();
-				}
-			}*/
+			Ctrl.trigger(key);
 
 			return false;
 		}); // keydown
@@ -95,10 +89,21 @@ Ctrl.__init__ = function(cb) {
 			}
 		}); // keyup
 
-		/*Ctrl.onkeydown = function(key, cb) {
-			keydownhandlers[key] = keydownhandlers[key] || [];
-			keydownhandlers[handlers.length] = cb;
-		};*/ // onkeydown
+		var handlermap = {};
+
+		Ctrl.trigger = function(key) {
+			var handlers = handlermap[key];
+			if (handlers) {
+				for (var i = 0; i < handlers.length; ++i) {
+					handlers[i]();
+				}
+			}
+		}; // trigger
+
+		Ctrl.listen = function(key, cb) {
+			var handlers = handlermap[key] = handlermap[key] || [];
+			handlers[handlers.length] = cb;
+		}; // listen
 
 		Ctrl.update = function(elapsed) {
 			for (var k in pressed) {
