@@ -56,6 +56,8 @@ game.bounds = {
 	'z': [-1, 1]
 };
 
+game.fps = 0;
+
 var Obj;
 var Ctrl;
 var HUD;
@@ -163,6 +165,16 @@ game.start = function() {
 		bricky -= Brick.DEFAULT_HEIGHT + 0.5;
 	}
 
+	// listeners
+
+	Ctrl.listen('space', function() {
+		if (game.paused) {
+			game.unpause();
+		} else {
+			game.pause();
+		}
+	}); // space
+
 	// loop
 
 	var prev;
@@ -170,10 +182,6 @@ game.start = function() {
 
 	var loop = function(ms) {
 		elapsed = ms - prev;
-
-		if (Ctrl.pressed['space']) {
-			game.paused = !game.paused;
-		}
 
 		if (!game.paused) {
 			for (var k in objmap) {
@@ -210,6 +218,33 @@ game.start = function() {
 	prev = window.performance.now();
 	setTimeout(loop.bind(prev), 1);
 }; // start
+
+var handlermap = {};
+
+game.trigger = function(type) {
+	var handlers = handlermap[type];
+	if (handlers) {
+		var event = {'type': type};
+		for (var i = 0; i < handlers.length; ++i) {
+			handlers[i](event);
+		}
+	}
+}; // trigger
+
+game.listen = function(type, cb) {
+	var handlers = handlermap[type] = handlermap[type] || [];
+	handlers[handlers.length] = cb;
+}; // listen
+
+game.pause = function() {
+	game.paused = true;
+	game.trigger('pause');
+}; // pause
+
+game.unpause = function() {
+	game.paused = false;
+	game.trigger('unpause');
+}; // unpause
 
 game.rand = function(min, max, decimal) {
 	if (min instanceof Array) {
