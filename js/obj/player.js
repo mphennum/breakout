@@ -28,6 +28,7 @@ Player.__init__ = function(cb) {
 
 			parent.call(this, opts);
 
+			this.score = 0;
 			this.speed = opts.speed || 0.15;
 		}; // constructor
 
