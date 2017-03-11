@@ -18,13 +18,13 @@ Brick.__init__ = function(cb) {
 		Brick = Obj.Brick = function(opts) {
 			opts = opts || {};
 
-			opts.val = opts.val || 1;
-
 			opts.width = opts.width || Brick.DEFAULT_WIDTH;
 			opts.height = opts.height || Brick.DEFAULT_HEIGHT;
 			opts.depth = opts.depth || 2;
 
 			parent.call(this, opts);
+
+			this.val = opts.val || 1;
 		}; // constructor
 
 		Brick.prototype = Object.create(parent.prototype);
