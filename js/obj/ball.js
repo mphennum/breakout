@@ -25,6 +25,7 @@ Ball.__init__ = function(cb) {
 
 			parent.call(this, opts);
 
+			this.player = opts.player;
 			this.dir = opts.dir || PI; // 0 is up, PI is down
 			this.setSpeed(opts.speed || 2);
 		}; // constructor
@@ -101,6 +102,7 @@ Ball.__init__ = function(cb) {
 					this.setSpeedX(-this.speedx);
 				}
 
+				this.player.score += obj.val;
 				obj.remove();
 			}
 		}; // handleCollision
