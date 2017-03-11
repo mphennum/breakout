@@ -66,14 +66,6 @@ var objmap = game.objmap;
 var collidemap = game.collidemap;
 var bounds = game.bounds;
 
-game.test = function() {
-	/*game.log('Ball collision');
-	game.log('ball.mesh.position', game.ball.mesh.position);
-	game.log('ball.boundingbox.min', game.ball.boundingbox.min);
-	game.log('player.mesh.position', game.player.mesh.position);
-	game.log('player.boundingbox.min', game.player.boundingbox.min);*/
-}; // test
-
 game.start = function() {
 	var timer;
 	window.onresize = function() {
@@ -103,7 +95,7 @@ game.start = function() {
 	var player = game.player = new Obj.Player({'y': bounds.y[0] + 4});
 	player.render();
 
-	var ball = game.ball = new Obj.Ball();
+	var ball = game.ball = new Obj.Ball({'player': player});
 	ball.render();
 
 	// walls
@@ -154,7 +146,8 @@ game.start = function() {
 			var brick = new Brick({
 				'color': color,
 				'x': brickx,
-				'y': bricky
+				'y': bricky,
+				'val': brickrowcolors.length - ri
 			});
 
 			brick.render();
@@ -180,8 +173,20 @@ game.start = function() {
 	var prev;
 	var elapsed;
 
+	var frames = 0;
+	var elapsedsum = 0;
+
 	var loop = function(ms) {
 		elapsed = ms - prev;
+
+		++frames;
+		elapsedsum += elapsed;
+
+		if (elapsedsum > 1000) {
+			game.fps = Math.round(frames * 1000 / elapsedsum);
+			frames = 0;
+			elapsedsum = 0;
+		}
 
 		if (!game.paused) {
 			for (var k in objmap) {
@@ -215,8 +220,15 @@ game.start = function() {
 		requestAnimationFrame(loop);
 	}; // loop
 
+	// prevent negative elapsed times in some browsers
+	var preloop = function(ms) {
+		elapsed = ms - prev;
+		requestAnimationFrame(elapsed <= 0 ? preloop : loop);
+	}; // preloop
+
 	prev = window.performance.now();
-	setTimeout(loop.bind(prev), 1);
+	//setTimeout(loop.bind(prev), 1);
+	requestAnimationFrame(preloop);
 }; // start
 
 var handlermap = {};
