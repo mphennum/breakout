@@ -83,9 +83,6 @@ game.start = function() {
 	Renderer = game.Renderer;
 	Renderer.init({'parent': $parent});
 
-	HUD = game.HUD;
-	HUD.init({'parent': $parent});
-
 	var camera = new Obj.Camera();
 	camera.render();
 
@@ -97,6 +94,9 @@ game.start = function() {
 
 	var ball = game.ball = new Obj.Ball({'player': player});
 	ball.render();
+
+	HUD = game.HUD;
+	HUD.init({'parent': $parent, 'player': player});
 
 	// walls
 
