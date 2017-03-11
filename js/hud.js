@@ -31,8 +31,13 @@ HUD.__init__ = function(cb) {
 
 		$fps = document.createElement('div');
 		$fps.className = 'game-hud-fps';
-		//$fps.style.
 		$this.appendChild($fps);
+
+		// score
+
+		$score = document.createElement('div');
+		$score.className = 'game-hud-score';
+		$this.appendChild($score);
 
 		// resize
 		game.onresize(function(width, height) {
@@ -42,7 +47,6 @@ HUD.__init__ = function(cb) {
 		// #TODO
 		// lives / balls remaining (from player)
 		// pause screen + instructions
-		// score (from player)
 		// opacity / transparency
 	}; // init
 
@@ -50,6 +54,11 @@ HUD.__init__ = function(cb) {
 		if (game.fps !== fps) {
 			fps = game.fps;
 			$fps.innerHTML = fps + ' fps';
+		}
+
+		if (player.score !== score) {
+			score = player.score;
+			$score.innerHTML = score + ' point' + ((score === 1) ? '' : 's');
 		}
 	}; // update
 
