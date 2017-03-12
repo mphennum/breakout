@@ -24,9 +24,6 @@ HUD.__init__ = function(cb) {
 
 		$pause.style.top = ((event.height - $pause.offsetHeight) / 2) + 'px';
 		$pause.style.left = ((event.width - $pause.offsetWidth) / 2) + 'px';
-
-		game.log('top', (event.height - $pause.offsetHeight) / 2);
-		game.log('left', (event.width - $pause.offsetWidth) / 2);
 	}; // resize
 
 	HUD.init = function(opts) {
