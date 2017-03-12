@@ -15,7 +15,11 @@ for (var i = 0; i < scripts.length; ++i) {
 
 		try {
 			baseurl = src.substr(0, src.length - 10);
-			opts = JSON.parse(script.innerHTML);
+
+			var html = script.innerHTML.trim();
+			if (html) {
+				opts = JSON.parse(html);
+			}
 		} catch (e) {
 			console.error('unable to parse game options');
 		}
@@ -67,16 +71,6 @@ var collidemap = game.collidemap;
 var bounds = game.bounds;
 
 game.start = function() {
-	var timer;
-	window.onresize = function() {
-		clearTimeout(timer);
-		timer = setTimeout(function(event) {
-			for (var i = 0; i < resizecbs.length; ++i) {
-				resizecbs[i](window.innerWidth, window.innerHeight);
-			}
-		}, 99);
-	}; // onresize
-
 	Obj = game.Obj;
 	Ctrl = game.Ctrl;
 
@@ -170,6 +164,8 @@ game.start = function() {
 
 	// loop
 
+	game.pause();
+
 	var prev;
 	var elapsed;
 
@@ -182,7 +178,7 @@ game.start = function() {
 		++frames;
 		elapsedsum += elapsed;
 
-		if (elapsedsum > 1000) {
+		if (elapsedsum > 500) {
 			game.fps = Math.round(frames * 1000 / elapsedsum);
 			frames = 0;
 			elapsedsum = 0;
@@ -223,7 +219,7 @@ game.start = function() {
 	// prevent negative elapsed times in some browsers
 	var preloop = function(ms) {
 		elapsed = ms - prev;
-		requestAnimationFrame(elapsed <= 0 ? preloop : loop);
+		requestAnimationFrame((elapsed <= 0) ? preloop : loop);
 	}; // preloop
 
 	prev = window.performance.now();
@@ -231,12 +227,20 @@ game.start = function() {
 	requestAnimationFrame(preloop);
 }; // start
 
+// events
+
 var handlermap = {};
 
-game.trigger = function(type) {
+game.trigger = function(type, opts) {
 	var handlers = handlermap[type];
 	if (handlers) {
 		var event = {'type': type};
+		if (opts) {
+			for (var k in opts) {
+				event[k] = opts[k];
+			}
+		}
+
 		for (var i = 0; i < handlers.length; ++i) {
 			handlers[i](event);
 		}
@@ -244,9 +248,25 @@ game.trigger = function(type) {
 }; // trigger
 
 game.listen = function(type, cb) {
+	if (type instanceof Array) {
+		for (var i = 0; i < type.length; ++i) {
+			game.listen(type[i], cb);
+		}
+
+		return;
+	}
+
 	var handlers = handlermap[type] = handlermap[type] || [];
 	handlers[handlers.length] = cb;
 }; // listen
+
+var resizetimer;
+window.onresize = function() {
+	clearTimeout(resizetimer);
+	resizetimer = setTimeout(function(event) {
+		game.trigger('resize', {'width': window.innerWidth, 'height': window.innerHeight});
+	}, 99);
+}; // onresize
 
 game.pause = function() {
 	game.paused = true;
@@ -258,54 +278,7 @@ game.unpause = function() {
 	game.trigger('unpause');
 }; // unpause
 
-game.rand = function(min, max, decimal) {
-	if (min instanceof Array) {
-		return min[Math.rand(0, min.length - 1)];
-	}
-
-	if (decimal) {
-		return (min + (Math.random() * (max - min)))
-	}
-
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-}; // rand
-
-/*
-var idchars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-var idcharslen = idchars.length;
-var lastid = null;
-var idcharmap = {};
-for (var i = 0; i < idcharslen; ++i) {
-	idcharmap[idchars[i]] = i;
-}
-
-game.genID = function() {
-	if (lastid === null) {
-		lastid = idchars[0];
-		return lastid;
-	}
-
-	var id = lastid;
-	var i = id.length - 1;
-	for (; i > -1; --i) {
-		var pos = idcharmap[id[i]] + 1;
-		if (pos < idcharslen) {
-			id = id.substr(0, i) + idchars[pos] + id.substr(i + 1);
-			break;
-		}
-
-		//console.log('no break');
-		id = id.substr(0, i) + idchars[0] + id.substr(i + 1);
-	}
-
-	if (i === -1) {
-		id += idchars[0];
-	}
-
-	lastid = id;
-	return id;
-}; // genID
-*/
+// world
 
 game.add = function(obj) {
 	if (obj.update) {
@@ -593,10 +566,58 @@ game.load = function(module, cb) {
 
 // other
 
-var resizecbs = [];
-game.onresize = function(cb) {
-	resizecbs[resizecbs.length] = cb;
-}; // onresize
+game.rand = function(min, max, decimal) {
+	if (min instanceof Array) {
+		return min[Math.rand(0, min.length - 1)];
+	}
+
+	if (decimal) {
+		return (min + (Math.random() * (max - min)))
+	}
+
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}; // rand
+
+/*
+var idchars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+var idcharslen = idchars.length;
+var lastid = null;
+var idcharmap = {};
+for (var i = 0; i < idcharslen; ++i) {
+	idcharmap[idchars[i]] = i;
+}
+
+game.genID = function() {
+	if (lastid === null) {
+		lastid = idchars[0];
+		return lastid;
+	}
+
+	var id = lastid;
+	var i = id.length - 1;
+	for (; i > -1; --i) {
+		var pos = idcharmap[id[i]] + 1;
+		if (pos < idcharslen) {
+			id = id.substr(0, i) + idchars[pos] + id.substr(i + 1);
+			break;
+		}
+
+		//console.log('no break');
+		id = id.substr(0, i) + idchars[0] + id.substr(i + 1);
+	}
+
+	if (i === -1) {
+		id += idchars[0];
+	}
+
+	lastid = id;
+	return id;
+}; // genID
+*/
+
+game.yield = function(cb) {
+	setTimeout(cb, 1);
+}; // yield
 
 game.log = function() {
 	if (game.dev) {
