@@ -67,9 +67,9 @@ Renderer.__init__ = function(cb) {
 			renderer.shadowMapHeight = 1024;
 
 			// resize
-			game.onresize(function(width, height) {
-				renderer.setSize(width, height);
-			}); // onresize
+			game.listen('resize', function(event) {
+				renderer.setSize(event.width, event.height);
+			}); // resize
 		}; // init
 
 		Renderer.render = function() {
@@ -94,10 +94,10 @@ Renderer.__init__ = function(cb) {
 				opts.far || Renderer.DEFAULT_FAR
 			);
 
-			game.onresize(function(width, height) {
-				camera.aspect = width / height;
+			game.listen('resize', function(event) {
+				camera.aspect = event.width / event.height;
 				camera.updateProjectionMatrix();
-			}); // onresize
+			}); // resize
 
 			return camera;
 		}; // renderCamera
