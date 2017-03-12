@@ -16,14 +16,18 @@ HUD.__init__ = function(cb) {
 	var $score;
 
 	var $pause;
+	var pausewidth;
+	var pauseheight;
 
 	var player;
 
 	var resize = function(event) {
 		$this.style.height = event.height;
 
-		$pause.style.top = ((event.height - $pause.offsetHeight) / 2) + 'px';
-		$pause.style.left = ((event.width - $pause.offsetWidth) / 2) + 'px';
+		pausewidth = $pause.offsetWidth || pausewidth;
+		pauseheight = $pause.offsetHeight || pauseheight;
+		$pause.style.top = ((event.height - pauseheight) / 2) + 'px';
+		$pause.style.left = ((event.width - pausewidth) / 2) + 'px';
 	}; // resize
 
 	HUD.init = function(opts) {
