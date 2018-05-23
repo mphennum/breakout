@@ -65,7 +65,7 @@ canvas {
 	right: 5px;
 }
 
-.game-hud .game-hud-pause {
+.game-hud .game-hud-window {
 	background-color: rgba(99, 99, 99, 0.5);
 	opacity: 0.9;
 
@@ -76,7 +76,7 @@ canvas {
 	left: 0;
 }
 
-.game-hud .game-hud-pause h1 {
+.game-hud .game-hud-window h1 {
 	font-size: 1.25em;
 	font-weight: bold;
 	text-align: center;
@@ -84,7 +84,7 @@ canvas {
 	margin-bottom: 10px;
 }
 
-.game-hud .game-hud-pause p {
+.game-hud .game-hud-window p {
 	font-weight: bold;
 	text-align: center;
 }
