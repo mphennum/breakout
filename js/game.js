@@ -33,7 +33,8 @@ var $body = document.getElementsByTagName('body')[0];
 var $parent = opts.parent && document.querySelector(opts.parent) || $body;
 
 game.dev = true;
-game.over = false;
+game.over = false; // true when all bricks are gone, or ball is gone
+game.won = false; // true when all bricks are gone
 game.paused = false;
 game.bricks = 0;
 game.score = 0;
@@ -50,6 +51,9 @@ game.elemap = {
 	'$body': $body,
 	'$parent': $parent
 };
+
+game.width = window.innerWidth;
+game.height = window.innerHeight;
 
 game.objmap = {}; // objs that must be rendered / updated
 game.collidemap = {}; // objs that can collide with eachother
@@ -88,6 +92,20 @@ game.start = function() {
 
 	var ball = game.ball = new Obj.Ball({'player': player});
 	ball.render();
+
+	ball.listen('remove', function() {
+		game.over = true;
+		//game.won = false;
+		game.trigger('over');
+	});
+
+	ball.listen('brick-remove', function() {
+		if (--game.bricks < 1) {
+			game.over = true;
+			game.won = true;
+			game.trigger('over');
+		}
+	});
 
 	HUD = game.HUD;
 	HUD.init({'parent': $parent, 'player': player});
@@ -145,6 +163,7 @@ game.start = function() {
 			});
 
 			brick.render();
+			game.bricks++;
 
 			brickx += Brick.DEFAULT_WIDTH + 0.5;
 		}
@@ -184,7 +203,7 @@ game.start = function() {
 			elapsedsum = 0;
 		}
 
-		if (!game.paused) {
+		if (!game.paused && !game.over) {
 			for (var k in objmap) {
 				objmap[k].update(elapsed);
 			}
@@ -264,18 +283,24 @@ var resizetimer;
 window.onresize = function() {
 	clearTimeout(resizetimer);
 	resizetimer = setTimeout(function(event) {
-		game.trigger('resize', {'width': window.innerWidth, 'height': window.innerHeight});
+		game.width = window.innerWidth;
+		game.height = window.innerHeight;
+		game.trigger('resize', {'width': game.width, 'height': game.height});
 	}, 99);
 }; // onresize
 
 game.pause = function() {
-	game.paused = true;
-	game.trigger('pause');
+	if (!game.over) {
+		game.paused = true;
+		game.trigger('pause');
+	}
 }; // pause
 
 game.unpause = function() {
-	game.paused = false;
-	game.trigger('unpause');
+	if (!game.over) {
+		game.paused = false;
+		game.trigger('unpause');
+	}
 }; // unpause
 
 // world
