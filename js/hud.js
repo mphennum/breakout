@@ -60,9 +60,9 @@ HUD.__init__ = function(cb) {
 		$pause.style.display = 'none';
 		$pause.innerHTML =
 			'<h1>Breakout</h1>' +
-			'<p>left: a</p>' +
-			'<p>right: d</p>' +
-			'<p>unpause: space</p>' +
+			'<p>left: LEFT or A</p>' +
+			'<p>right: RIGHT or D</p>' +
+			'<p>unpause: SPACE</p>' +
 			'<p style="margin-top: 10px">credit: mph</p>'
 		;
 
