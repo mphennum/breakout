@@ -15,20 +15,34 @@ HUD.__init__ = function(cb) {
 	var score;
 	var $score;
 
-	var $pause;
-	var pausewidth;
-	var pauseheight;
+	var $windows = {};
 
 	var player;
 
 	var resize = function(event) {
 		$this.style.height = event.height;
 
-		pausewidth = $pause.offsetWidth || pausewidth;
-		pauseheight = $pause.offsetHeight || pauseheight;
-		$pause.style.top = ((event.height - pauseheight) / 2) + 'px';
-		$pause.style.left = ((event.width - pausewidth) / 2) + 'px';
+		for (var k in $windows) {
+			var win = $windows[k];
+			var $ele = win.$ele;
+			win.w = $ele.offsetWidth || win.w;
+			win.h = $ele.offsetHeight || win.h;
+			$ele.style.top = ((event.height - win.h) / 2) + 'px';
+			$ele.style.left = ((event.width - win.w) / 2) + 'px';
+		}
 	}; // resize
+
+	var createWindow = function(name, html) {
+		var win = $windows[name] = {};
+		var $ele = win.$ele = document.createElement('div');
+		$ele.className = 'game-hud-window game-hud-window-' + name;
+		$ele.style.display = 'none';
+		$ele.innerHTML = html;
+
+		$this.appendChild($ele);
+
+		return $ele;
+	}; // createWindow
 
 	HUD.init = function(opts) {
 		opts = opts || {};
@@ -53,20 +67,15 @@ HUD.__init__ = function(cb) {
 		$score.className = 'game-hud-score';
 		$this.appendChild($score);
 
-		// pause screen
+		// windows
 
-		$pause = document.createElement('div');
-		$pause.className = 'game-hud-pause';
-		$pause.style.display = 'none';
-		$pause.innerHTML =
+		var $pause = createWindow('pause',
 			'<h1>Breakout</h1>' +
 			'<p>left: LEFT or A</p>' +
 			'<p>right: RIGHT or D</p>' +
 			'<p>unpause: SPACE</p>' +
 			'<p style="margin-top: 10px">credit: mph</p>'
-		;
-
-		$this.appendChild($pause);
+		);
 
 		game.listen('pause', function(event) {
 			$pause.style.display = '';
