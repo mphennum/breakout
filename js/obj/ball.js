@@ -17,6 +17,7 @@ Ball.__init__ = function(cb) {
 
 		var PI = Math.PI;
 		var TAU = PI * 2;
+		var SPEEDCONSTANT = 0.08;
 
 		Ball = Obj.Ball = function(opts) {
 			opts = opts || {};
@@ -77,7 +78,7 @@ Ball.__init__ = function(cb) {
 		}; // setSpeedY
 
 		Ball.prototype.update = function(elapsed) {
-			this.move(this.speedx, this.speedy, 0);
+			this.move(this.speedx * elapsed * SPEEDCONSTANT, this.speedy * elapsed * SPEEDCONSTANT, 0);
 		}; // update
 
 		Ball.prototype.handleCollision = function(obj) {
